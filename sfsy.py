@@ -342,7 +342,7 @@ def sf_fm_b(): #蜂蜜大冒险扩容
    if info['success']: 
     print(f'成功扩容{info["obj"]}容量')
    else: 
-    print(f'扩容失败{info}') 
+    print(f'扩容失败') 
 
 def sf_fm_c(): #蜂蜜浏览任务
    header = test_header()
@@ -357,7 +357,7 @@ def sf_fm_c(): #蜂蜜浏览任务
       response.encoding = "utf-8"
       info = json.loads(response.text)
       if info['success']:
-       print(f"任务完成，{info}")
+       print(f"任务完成")
       else:
        print("任务失败")
 def sf_fm_d():#蜂蜜浏览任务领取
@@ -376,7 +376,7 @@ def sf_fm_d():#蜂蜜浏览任务领取
    response.encoding = "utf-8"  
    info = json.loads(response.text)
    if info['success']:
-       print(f"领取成功，{info}")
+       print(f"领取成功")
    else:
        print("领取失败")
 def index(url):
