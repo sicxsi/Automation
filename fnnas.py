@@ -2,7 +2,7 @@
 # name: 飞牛nas
 # Author: sicxs
 # Date: 2024-11-4
-# export fnnas="cookie" @,& 分割
+# export wy_fnnas="cookie" @,& 分割
 # cron: 20 8 * * *
 # new Env('飞牛nas');
 import requests

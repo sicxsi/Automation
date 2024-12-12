@@ -52,6 +52,7 @@ def attendance(cookie):
         info = response.text
         time.sleep(3)
         if "签到已得" in info:
+         print("签到成功，请勿重复刷新。")
          torrents(cookie)
         else :
           print("签到中...")

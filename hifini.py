@@ -2,7 +2,7 @@
 # name: 音乐磁场
 # Author: sicxs
 # Date: 2024-11-2
-# export wx_hifini="cookie"  @,&分割
+# export wy_hifini="cookie"  @,&分割
 # cron: 11 8 * * *
 # new Env('音乐磁场');
 import requests

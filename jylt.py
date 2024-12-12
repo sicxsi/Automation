@@ -39,7 +39,6 @@ def index(cookie): #登录
         matches = pattern.findall(info) 
         matches1 = pattern1.findall(info)
         print(f"用户名: {matches[0][1]}")
-        print(matches1)
         hash = matches1[0]
         id = matches[0][0]
         qiandao(cookie,hash)

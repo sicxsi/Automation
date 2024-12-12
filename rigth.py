@@ -58,8 +58,8 @@ def my(cookie):
 
 def sicxs():
     try:
-        env_cookie = os.environ.get("wx_rigth")
-        si_cookie = getattr(config, 'wx_rigth', '') 
+        env_cookie = os.environ.get("wy_rigth")
+        si_cookie = getattr(config, 'wy_rigth', '') 
         if env_cookie and si_cookie:
             cookies = env_cookie + "\n" + si_cookie
         elif env_cookie:
