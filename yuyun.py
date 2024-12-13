@@ -44,7 +44,7 @@ def index(username,password):#登录信息
         print(f"登录成功,用户名：{username}")
         qiadnao(cookies,Token)
     else:
-        print(f"登录失败,{info['message"']}")
+        print(f"登录失败,{info['message']}")
 
 
 def qiadnao(cookie,Token):
