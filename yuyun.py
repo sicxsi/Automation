@@ -1,8 +1,8 @@
 # name: 雨云
 # Author: sicxs
 # Date: 2024-12-4/
-# export wy_yuyun=""
-# 换行分割 
+# export wy_yuyun="账号#密码"
+# 换行 & 分割 
 # 功能:签到
 # cron: 20 8 * * *
 # new Env('雨云');
