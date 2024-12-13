@@ -63,7 +63,7 @@ def index(useradmin,password): #登录信息
     response = requests.post(url, json=data, headers=headerd)
     response.encoding = "utf-8"
     info = json.loads(response.text)
-    print(f"用户名：{info["userInfo"]["username"]} 积分：{info["userInfo"]["silver"]}")
+    print(f"用户名：{info['userInfo']['username']} 积分：{info['userInfo']['silver']}")
     if info['userInfo']['signIn'] == "true":
         print("今日已签到")
     else:
