@@ -79,11 +79,12 @@ def app_info(username,password):  # 登录
         "Accept-Encoding": "gzip",
         "User-Agent": "okhttp/4.10.0"
         }
+    timestamp = int(time.time() * 1000)
     data = {
         "account": username,
         "password": password,
         "reg_id": "65l2kfa3hsa3gg0", #固定值
-        "token": "1733215057794", #固定值
+        "token": timestamp, 
         "type": "5"
         }
     response = requests.post(url, headers=header, json=data)

@@ -43,6 +43,8 @@ def index(username,password):#登录信息
         Token = cookies['X-CSRF-Token']
         print(f"登录成功,用户名：{username}")
         qiadnao(cookies,Token)
+        time.sleep(3)
+        wy_info(cookies,Token)
     else:
         print(f"登录失败,{info['message']}")
 
@@ -79,6 +81,23 @@ def qiadnao(cookie,Token):
     else:
         print(info['message'])
 
+def wy_info(cookie,Token):
+    url = "https://api.v2.rainyun.com/user/?no_cache=false"
+    header = {
+            "authority": "api.v2.rainyun.com",
+            "method": "GET",
+            "path": "/user/?no_cache=false",
+            "scheme": "https",
+            "x-csrf-token": Token,
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+            "accept": "application/json, text/plain, */*",
+            "content-type": "application/json",
+            "origin": "https://app.rainyun.com",
+    }
+    response = s.get(url, headers=header, cookies=cookie)
+    response.encoding = "utf-8"
+    info = json.loads(response.text)
+    print(f"当前积分：{info['data']['Points']}")
 def sicxs():
     try:
         env_cookie = os.environ.get("wy_yuyun")

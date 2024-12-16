@@ -32,6 +32,8 @@ def index(uid,skey):
     qiandao(uid,skey)
     time.sleep(3)
     task_liulan(uid,skey)
+    time.sleep(3)
+    wx_info(uid,skey)
 def qiandao(uid,skey):#签到
     url = "https://api-saas.miniso.com/task-manage-platform/api/activity/signInTask/award/receive"
     header = get_headers(uid, skey)
@@ -47,7 +49,7 @@ def task_liulan(uid,skey):#浏览任务
     print("正在开始浏览任务") 
     url = "https://api-saas.miniso.com/task-manage-platform/api/activity/task/uvClick"
     header = get_headers(uid, skey)
-    taskId = [176,175]
+    taskId = [176,175,177]
     for i in taskId:
      data = {"activityId":"18","taskId":i,"taskType":5}
      response = requests.post(url=url,headers=header,json=data)
@@ -83,6 +85,27 @@ def task_lq(uid,skey,id):#领取奖励
         print("领取任务奖励成功") 
     else:
         print(info['message'])    
+
+def wx_info(uid,skey):
+    url = "https://api-saas.miniso.com/task-manage-platform/api/virtualCoin/member"
+    header = {
+        "authority": "api-saas.miniso.com",
+        "method": "GET",
+        "content-latitude": "31.221139907836914",
+        "content-longitude": "121.49022668457031",
+        "tenant-code": "MINISO",
+        "x-client-source": "MINISO_WX_MINI",
+        "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 MicroMessenger/7.0.20.1781(0x6700143B) NetType/WIFI MiniProgramEnv/Windows WindowsWechat/WMPF WindowsWechat(0x63090a13) XWEB/8555",
+        "tenant": "MINISO",
+        "content-uid": uid,
+        "content-type": "application/json",
+        "content-skey": skey,
+        "referer": "https://servicewechat.com/wx2a212470bade49bf/924/page-frame.html",
+        }
+    response = requests.get(url=url,headers=header)
+    response.encoding = "utf-8"
+    info = json.loads(response.text)
+    print(f"当前mini币：{info['data']['quantity']}")
 
 
 def sicxs():
