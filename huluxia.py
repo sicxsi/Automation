@@ -104,7 +104,7 @@ def sicxs():
         try:
             print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
             list = list_cookie_i.split("#")
-            app_list(list[0], list[1])
+            index(list[0], list[1])
         except Exception as e:
             print(f"账号【{i + 1}/{total_cookies}】执行出错")    
 
