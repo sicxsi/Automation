@@ -31,12 +31,13 @@ def index(username,password): #登录信息
     app_qiandao(key)
     
 def app_qiandao(key): #签到
+    print("开始执行签到任务...")
     id = app_list()
     for i in id:
       timestamp = int(time.time() * 1000)
       sign = "cat_id" + str(i[0]) + "time" + str(timestamp) + "fa1c28a5b62e79c3e63d9030b6142e4b"
       sign = hashlib.md5(sign.encode('utf-8')).hexdigest()
-      url = f"http://floor.huluxia.com/user/signin/ANDROID/4.1.8?platform=2&gkey=000000&app_version=4.3.0.7.1&versioncode=20141475&market_id=floor_web&_key={key}&phone_brand_type=OP&cat_id={i}&time={timestamp}"
+      url = f"http://floor.huluxia.com/user/signin/ANDROID/4.1.8?platform=2&gkey=000000&app_version=4.3.0.7.1&versioncode=20141475&market_id=floor_web&_key={key}&phone_brand_type=OP&cat_id={i[0]}&time={timestamp}"
       headers = {
                 "Accept-Encoding": "identity",
                 "Host": "floor.huluxia.com",
@@ -53,8 +54,7 @@ def app_qiandao(key): #签到
           print(f"{i[1]} 签到成功，获得{info['experienceVal']}点经验")
       else:
          print(f"{i[1]},{info['msg']}")
-
-      print("签到完成")   
+    print("签到完成")
 def app_list(): #板块列表
     list = []
     url = f"https://floor.huluxia.com/category/list/ANDROID/4.2.3?"
