@@ -4,7 +4,7 @@
 # export Serv00=""
 # 换行分割 
 # 功能：登录保活
-# cron: 0 0 0 */7 * 
+# cron: 0 0 0 */7 * *
 # new Env('Serv00 保活');
 
 import paramiko
