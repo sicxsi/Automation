@@ -66,7 +66,7 @@ def sicxs():
     
     for i, cookie in enumerate(list_cookies):
         try:
-            print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+            log_and_append(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
             host, port, user, pwd = cookie.split("#")
             if index(host, int(port), user, pwd):
                 log_and_append(f"{user} 执行保活任务成功")
@@ -74,9 +74,8 @@ def sicxs():
                 log_and_append(f"{user} 执行保活任务失败")
         except Exception as e:
             log_and_append(f"账号【{i + 1}/{total_cookies}】执行出错: {e}")
+    log_and_append(f'\n-----------  执 行  结 束 -----------')
     
-    print(f'\n-----------  执 行  结 束 -----------')
-
 if __name__ == '__main__':
     sicxs()
     send("Serv00 保活", ''.join(msg))

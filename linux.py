@@ -24,23 +24,19 @@ def csrf():  # csrf
     header = {
         "authority": "linux.do",
         "method": "GET",
+        "path": "/session/csrf",
         "scheme": "https",
-        "sec-ch-ua-platform": "\"Android\"",
         "x-csrf-token": "undefined",
-        "sec-ch-ua": "\"Microsoft Edge\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"",
-        "sec-ch-ua-mobile": "?1",
         "x-requested-with": "XMLHttpRequest",
-        "user-agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36 Edg/131.0.0.0",
+        "sec-ch-ua-full-version": "\"131.0.2903.112\"",
         "accept": "application/json, text/javascript, */*; q=0.01",
-        "discourse-present": "true",
-        "sec-fetch-site": "same-origin",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-dest": "empty",
-        "referer": "https://linux.do/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+        "referer": "https://linux.do/login",
         "accept-encoding": "gzip, deflate, br, zstd",
         "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
+        "cookie": "",
         "priority": "u=1, i"
-    }
+        }
     response = s.get(url=url, headers=header)
     response.encoding = "utf-8"
     info = response.text
@@ -64,9 +60,6 @@ def headers():  # 登录请求头
         "discourse-present": "true",
         "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
         "origin": "https://linux.do",
-        "sec-fetch-site": "same-origin",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-dest": "empty",
         "referer": "https://linux.do/",
         "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
     }
@@ -107,7 +100,24 @@ def list_info():  # 获取 帖子列表
     for i in matches:
         post_list.append((i[0], i[1]))
     return post_list
-
+def wy_get():
+    url = "https://linux.do"
+    header = {
+        "authority": "linux.do",
+        "method": "GET",
+        "path": "/login",
+        "scheme": "https",
+        "origin": "https://linux.do",
+        "x-requested-with": "XMLHttpRequest",
+        "content-type": "application/x-www-form-urlencoded",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        "referer": "https://linux.do/login",
+        "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6"
+        }
+    response = s.get(url=url, headers=header)
+    response.encoding = "utf-8"
 def index(username, password):  # 登录
     url = "https://linux.do/session"
     header = headers()
@@ -117,13 +127,14 @@ def index(username, password):  # 登录
         "second_factor_method": "1",
         "timezone": "Asia/Shanghai"
     }
+    
     response = s.post(url=url, headers=header, data=data)
     response.encoding = "utf-8"
     info = json.loads(response.text)
     print(f"登录成功,用户名：{info['users'][0]['name']}")
     cookies = response.cookies
     list_info_a(cookies)
-    zonhgjie(cookies)
+    zongjie(cookies)
 
 def list_info_a(cookies):  # 浏览帖子
     posts = list_info()
@@ -136,7 +147,7 @@ def list_info_a(cookies):  # 浏览帖子
         time.sleep(random.randint(30, 50))
     print("浏览帖子任务完毕！")
     
-def zonhgjie(cookies):
+def zongjie(cookies):
     url = "https://linux.do/u/sicxs/summary.json"
     header = headers_a()
     response = s.get(url=url, headers=header, cookies=cookies)
@@ -163,13 +174,15 @@ def sicxs():
         print("请设置变量 export wy_linux='' 或在 config.py 中设置 wy_linux =")
         sys.exit()
 
-    list_cookie = re.split(r'\n|&|@', cookies)
+    list_cookie = re.split(r'\n|&', cookies)
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):
         try:
             print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
             list = list_cookie_i.split("#")
+            wy_get()
+            time.sleep(3)
             index(list[0], list[1])
         except Exception as e:
             print(f"账号【{i + 1}/{total_cookies}】执行出错")    
