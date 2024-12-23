@@ -41,7 +41,7 @@ def test_getSign(): # headers + 浏览任务sign
             'sec-fetch-dest': 'document',
             'accept-language': 'zh-CN,zh',
             'platform': 'MINI_PROGRAM',
-            'sysCode': 'MCS-MIMP-CORE',
+            'sysCode': 'MCS-MIMP-CORE',            
             'timestamp': timestamp,
             'signature': correct_signature
         }
@@ -56,16 +56,14 @@ def test_header():#蜂蜜 heaaders + sign
             'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36 NetType/WIFI MicroMessenger/7.0.20.1781(0x6700143B) WindowsWechat(0x63090551) XWEB/6945 Flue',
             'accept': 'application/json, text/plain, */*',
             'content-type': 'application/json;charset=UTF-8',
-            'platform' : 'MINI_PROGRAM',
             'sec-fetch-site': 'none',
             'sec-fetch-mode': 'navigate',
             'sec-fetch-user': '?1',
             'sec-fetch-dest': 'document',
             'accept-language': 'zh-CN,zh',
             'platform': 'MINI_PROGRAM',
-            'sysCode': 'MCS-MIMP-CORE',
             'channel': 'wxwdsj',
-
+            'sysCode': 'MCS-MIMP-CORE',
             'timestamp': timestamp,
             'signature': correct_signature
         }
@@ -323,7 +321,7 @@ def sf_fm_a(): #蜂蜜大冒险
      info = json.loads(response.text)
      if info['success']:
         gameNum = info['obj']['gameNum']
-        print(f'大冒险成功！剩余次数{gameNum}')
+        print(f'大冒险成功，剩余次数{gameNum}')
         time.sleep(2)
         gameNum -= 1
      elif info["errorMessage"] == '容量不足':
@@ -344,6 +342,28 @@ def sf_fm_b(): #蜂蜜大冒险扩容
    else: 
     print(f'扩容失败') 
 
+def sf_fm_f(): # 蜂蜜任务列表
+    header = test_header()
+    url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~receiveExchangeIndexService~taskDetail"
+    data = {}
+    response = s.post(url, headers=header, json=data)
+    response.encoding = "utf-8"
+    info = json.loads(response.text)
+    sf = []
+    if info['success']:
+        sf_list = info['obj']['list']
+        for task in sf_list:
+            task_type = task.get('taskType', '')
+            status = task.get('status', '')
+            task_code = task.get('taskCode', '')
+            sf.append({
+                'task_type': task_type,
+                'status': status,
+                'task_code': task_code
+            })
+        return sf
+    else:
+        print("获取失败")
 def sf_fm_c(): #蜂蜜浏览任务
    header = test_header()
    url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberEs~taskRecord~finishTask"
@@ -351,12 +371,14 @@ def sf_fm_c(): #蜂蜜浏览任务
     "B2BFB7A7D4F94400987C0821AD5D983B",
    ]
    for code in taskCode:
-      data = {"taskCode": code}
+      data = {
+         "taskCode": code
+         }
       response = s.post(url, headers=header,json=data)
       random_pause()
       response.encoding = "utf-8"
       info = json.loads(response.text)
-      if info['success']:
+      if info['obj']:
        print(f"任务完成")
       else:
        print("任务失败")
@@ -365,11 +387,10 @@ def sf_fm_d():#蜂蜜浏览任务领取
    url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~receiveExchangeIndexService~receiveHoney"
    taskType = [
     "BROWSER_CENTER_TASK_TYPE",
-    "BEES_GAME_TASK_TYPE"
    ]
    for i in taskType:
       data = {
-  "taskType": i
+         "taskType": i
     }
    response = s.post(url=url,json=data,headers=header)
    time.sleep(2)
@@ -379,6 +400,20 @@ def sf_fm_d():#蜂蜜浏览任务领取
        print(f"领取成功")
    else:
        print("领取失败")
+def sf_fm_e():# 蜂蜜积分
+   header = test_header()
+   url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~receiveExchangeIndexService~detail"
+   data = {
+        "pageNo": 1,
+        "pageSize": 10
+        }
+   response = s.post(url, json=data, headers=header)
+   response.encoding = "utf-8"
+   info = json.loads(response.text)
+   if info['success']:
+     print(f"蜂蜜: {info['obj']['usableHoney']}")
+   else:
+      print(info)
 def index(url):
     try:
      current_time = time.localtime()
@@ -388,16 +423,16 @@ def index(url):
      time.sleep(2)
      sf_c()
      time.sleep(2)
-     if day in [1]:
+     if day in [1,10,20]:
       sf_d()
      time.sleep(3)
      sf_b()
      time.sleep(2)
      print("开始蜂蜜游戏")
      sf_fm_a()
-     sf_fm_b()
      sf_fm_c()
      sf_fm_d()
+     sf_fm_e()
      if day in [26, 27, 28]:
          print("开始会员日任务")
          sf_hyr_a()
