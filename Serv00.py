@@ -1,7 +1,7 @@
 # name: Serv00
 # Author: sicxs
 # Date: 2024-12-22
-# export Serv00=""
+# export Serv00="host#端口#账号#密码"
 # 换行分割 
 # 功能：登录保活
 # cron: 0 0 0 */7 * *
@@ -25,7 +25,7 @@ def index(hostname, port, username, password):
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(hostname=hostname, port=port, username=username, password=password)
-        log_and_append("登录成功")
+        log_and_append("\n登录成功")
         
         stdin, stdout, stderr = ssh.exec_command('ls')
         log_and_append("\n查看目录")
@@ -56,9 +56,8 @@ def get_cookies():
     elif si_cookie:
         return si_cookie
     else:
-        log_and_append("请设置变量 export Serv00='' 或在 config.py 中设置 Serv00 =")
+        log_and_append("请设置变量 export Serv00='host#端口#账号#密码' 或在 config.py 中设置 Serv00 ='host#端口#账号#密码'")
         sys.exit()
-
 def sicxs():
     cookies = get_cookies()
     list_cookies = re.split(r'\n|&', cookies)
