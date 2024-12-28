@@ -19,78 +19,10 @@ import config
 
 s = requests.session()
 
-def csrf():  # csrf
-    url = "https://linux.do/session/csrf"
-    header = {
-        "authority": "linux.do",
-        "method": "GET",
-        "path": "/session/csrf",
-        "scheme": "https",
-        "x-csrf-token": "undefined",
-        "x-requested-with": "XMLHttpRequest",
-        "sec-ch-ua-full-version": "\"131.0.2903.112\"",
-        "accept": "application/json, text/javascript, */*; q=0.01",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-        "referer": "https://linux.do/login",
-        "accept-encoding": "gzip, deflate, br, zstd",
-        "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
-        "cookie": "",
-        "priority": "u=1, i"
-        }
-    response = s.get(url=url, headers=header)
-    response.encoding = "utf-8"
-    info = response.text
-    pattern = re.compile(r'"csrf":"(.*?)"')
-    matches = pattern.findall(info)
-    return matches[0]
 
-def headers():  # 登录请求头
-    csrf_token = csrf()
-    header = {
-        "authority": "linux.do",
-        "method": "POST",
-        "path": "/session",
-        "scheme": "https",
-        "x-csrf-token": csrf_token,
-        "sec-ch-ua": "\"Microsoft Edge\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"",
-        "sec-ch-ua-mobile": "?1",
-        "x-requested-with": "XMLHttpRequest",
-        "user-agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36 Edg/131.0.0.0",
-        "accept": "*/*",
-        "discourse-present": "true",
-        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "origin": "https://linux.do",
-        "referer": "https://linux.do/",
-        "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
-    }
-    return header
 
-def headers_a():  # 浏览帖子登录请求头
-    csrf_token = csrf()
-    header = {
-        "authority": "linux.do",
-        "method": "GET",
-        "scheme": "https",
-        "x-csrf-token": csrf_token,
-        "sec-ch-ua": "\"Microsoft Edge\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"",
-        "sec-ch-ua-mobile": "?1",
-        "x-requested-with": "XMLHttpRequest",
-        "user-agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36 Edg/131.0.0.0",
-        "accept": "*/*",
-        "discourse-present": "true",
-        "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-        "origin": "https://linux.do",
-        "sec-fetch-site": "same-origin",
-        "sec-fetch-mode": "cors",
-        "sec-fetch-dest": "empty",
-        "referer": "https://linux.do/",
-        "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
-    }
-    return header
-
-def list_info():  # 获取 帖子列表
+def list_info(header):  # 获取 帖子列表
     url = "https://linux.do/latest.rss"
-    header = headers_a()
     response = s.get(url=url, headers=header)
     response.encoding = "utf-8"
     info = response.text
@@ -100,57 +32,54 @@ def list_info():  # 获取 帖子列表
     for i in matches:
         post_list.append((i[0], i[1]))
     return post_list
-def wy_get():
-    url = "https://linux.do"
-    header = {
-        "authority": "linux.do",
-        "method": "GET",
-        "path": "/login",
-        "scheme": "https",
-        "origin": "https://linux.do",
-        "x-requested-with": "XMLHttpRequest",
-        "content-type": "application/x-www-form-urlencoded",
-        "upgrade-insecure-requests": "1",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        "referer": "https://linux.do/login",
-        "accept-language": "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6"
-        }
-    response = s.get(url=url, headers=header)
-    response.encoding = "utf-8"
-def index(username, password):  # 登录
-    url = "https://linux.do/session"
-    header = headers()
-    data = {
-        "login": username,
-        "password": password,
-        "second_factor_method": "1",
-        "timezone": "Asia/Shanghai"
+def index(cookies):
+    cookie_pairs = cookies.split(';')
+    cookies_dict = {}
+    for pair in cookie_pairs:
+        key, value = pair.split('=', 1)
+        cookies_dict[key.strip()] = value.strip()
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        'cache-control': 'max-age=0',
+        'sec-ch-ua': '"Google Chrome";v="131", "Chromium";v="131", "Not_A Brand";v="24"',
+        'sec-ch-ua-mobile': '?0',
+        'sec-ch-ua-platform': '"Windows"',
+        'upgrade-insecure-requests': '1',
+        'sec-fetch-site': 'same-origin',
+        'sec-fetch-mode': 'navigate',
+        'sec-fetch-user': '?1',
+        'sec-fetch-dest': 'document',
+        'referer': 'https://linux.do/login',
+        'accept-language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+        'priority': 'u=0, i',
     }
-    
-    response = s.post(url=url, headers=header, data=data)
+    response = requests.get('https://linux.do', cookies=cookies_dict, headers=headers)
+    time.sleep(random.randint(8, 12))
     response.encoding = "utf-8"
-    info = json.loads(response.text)
-    print(f"登录成功,用户名：{info['users'][0]['name']}")
-    cookies = response.cookies
-    list_info_a(cookies)
-    zongjie(cookies)
+    if "csrf" in response.text:
+        print("登录成功")
+        pattern = re.compile(r'<meta name="csrf-token" content="(.*?)" />')
+        matches = pattern.findall(response.text)
+        csrf = matches[0]
+        list_info_a(cookies_dict)
+        wy_info(cookies_dict)
 
-def list_info_a(cookies):  # 浏览帖子
-    posts = list_info()
+    else:
+        print("登陆失败,请查看cookie 是否正确")    
+def list_info_a(header):  # 浏览帖子
+    posts = list_info(header)
     for i in posts:
         url = f"https://linux.do/t/topic/{i[0]}"
-        header = headers_a()
-        response = s.get(url=url, headers=header, cookies=cookies)
+        response = s.get(url=url, headers=header)
         response.encoding = "utf-8"
         print(f"浏览帖子：{i[1]}")
         time.sleep(random.randint(30, 50))
     print("浏览帖子任务完毕！")
     
-def zongjie(cookies):
+def wy_info(header):
     url = "https://linux.do/u/sicxs/summary.json"
-    header = headers_a()
-    response = s.get(url=url, headers=header, cookies=cookies)
+    response = s.get(url=url, headers=header)
     response.encoding = "utf-8"
     info = json.loads(response.text)
     a = info['user_summary']['time_read']
@@ -180,10 +109,8 @@ def sicxs():
     for i, list_cookie_i in enumerate(list_cookie):
         try:
             print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
-            list = list_cookie_i.split("#")
-            wy_get()
-            time.sleep(3)
-            index(list[0], list[1])
+            print(f"正在初始化登录...")
+            index(list_cookie_i)
         except Exception as e:
             print(f"账号【{i + 1}/{total_cookies}】执行出错")    
 

@@ -29,12 +29,6 @@ def get_headers(uid,skey):
         "referer": "https://servicewechat.com/wx2a212470bade49bf/924/page-frame.html",
     }
 def index(uid,skey):
-    qiandao(uid,skey)
-    time.sleep(3)
-    task_liulan(uid,skey)
-    time.sleep(3)
-    wx_info(uid,skey)
-def qiandao(uid,skey):#签到
     url = "https://api-saas.miniso.com/task-manage-platform/api/activity/signInTask/award/receive"
     header = get_headers(uid, skey)
     data = {"activityId":"18","taskId":79}
@@ -42,9 +36,17 @@ def qiandao(uid,skey):#签到
     response.encoding = "utf-8"
     info = json.loads(response.text)
     if 200 == info['code']:
-        print("签到成功") 
+        print("签到成功")
+    elif 500 == info['code']:
+        pattern = re.compile(r'当前手机号(.*?)今日')
+        matches = pattern.findall(info['message'])
+        print(f"用户名：{matches[0]}")
+        time.sleep(3)
+        task_liulan(uid,skey)
+        time.sleep(3)
+        wx_info(uid,skey)
     else:
-        print(info['message']) 
+        print(info['message'])
 def task_liulan(uid,skey):#浏览任务
     print("正在开始浏览任务") 
     url = "https://api-saas.miniso.com/task-manage-platform/api/activity/task/uvClick"
@@ -132,6 +134,7 @@ def sicxs():
         try:
             print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
             list = list_cookie_i.split("#")
+            index(list[0], list[1])
             index(list[0], list[1])
         except Exception as e:
             print(f"账号【{i + 1}/{total_cookies}】执行出错")    

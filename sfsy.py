@@ -14,18 +14,6 @@ import time,re,os,sys
 import config
 s = requests.session()
 
-def getlogn(url): #登陆测试
-     url = url  
-     header = {
-        "authority": "mcs-mimp-web.sf-express.com",
-        "scheme": "https",
-        "upgrade-insecure-requests": "1",
-        "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 MicroMessenger/7.0.20.1781(0x6700143B) NetType/WIFI MiniProgramEnv/Windows WindowsWechat/WMPF WindowsWechat(0x63090a13) XWEB/8555",
-        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
-        }
-     response = s.get(url, headers=header)
-     login_mobile = s.cookies.get_dict().get('_login_mobile_', '')
-     print(f"登陆成功，用户名: {login_mobile}")
 def test_getSign(): # headers + 浏览任务sign
         timestamp = str(int(round(time.time() * 1000)))
         data_str = f'token=wwesldfs29aniversaryvdld29&timestamp={timestamp}&sysCode=MCS-MIMP-CORE'
@@ -92,7 +80,7 @@ def sf_a():#积分
     response = s.post(url, headers=header,json=data)
     response.encoding = "utf-8"
     info = json.loads(response.text)
-    print(f"当前积分:{info['obj']['totalPoint']}")
+    return info['obj']['totalPoint']
 def sf_a_a():#积分浏览任务列表
     url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~integralTaskStrategyService~queryPointTaskAndSignFromES"
     header = test_getSign()
@@ -411,15 +399,25 @@ def sf_fm_e():# 蜂蜜积分
    response.encoding = "utf-8"
    info = json.loads(response.text)
    if info['success']:
-     print(f"蜂蜜: {info['obj']['usableHoney']}")
+     return info['obj']['usableHoney']
    else:
       print(info)
 def index(url):
     try:
+     url = url  
+     header = {
+        "authority": "mcs-mimp-web.sf-express.com",
+        "scheme": "https",
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 MicroMessenger/7.0.20.1781(0x6700143B) NetType/WIFI MiniProgramEnv/Windows WindowsWechat/WMPF WindowsWechat(0x63090a13) XWEB/8555",
+        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+        }
+     response = s.get(url, headers=header)
+     login_mobile = s.cookies.get_dict().get('_login_mobile_', '')
+     print(f"登陆成功，用户名: {login_mobile}")
      current_time = time.localtime()
      day = current_time.tm_mday
-     getlogn(url)
-     sf_a()
+     print(f"账号[{login_mobile}]任务执行前积分：{sf_a()}")
      time.sleep(2)
      sf_c()
      time.sleep(2)
@@ -429,10 +427,11 @@ def index(url):
      sf_b()
      time.sleep(2)
      print("开始蜂蜜游戏")
+     print(f"账号[{login_mobile}]任务执行前蜂蜜：{sf_fm_e()}")
      sf_fm_a()
      sf_fm_c()
      sf_fm_d()
-     sf_fm_e()
+     print(f"账号[{login_mobile}]任务执行后蜂蜜：{sf_fm_e()}")
      if day in [26, 27, 28]:
          print("开始会员日任务")
          sf_hyr_a()
@@ -442,27 +441,26 @@ def index(url):
          sf_hyr_f()
          print("再次检测红包数量")
          sf_hyr_c()
-     sf_a()
+     print(f"账号[{login_mobile}]任务执行后积分：{sf_a()}")
     except Exception as e:
         print(e)
 def sicxs():
     # 从系统环境变量获取cookie
     try:
         env_cookie = os.environ.get("sfsy")
-        sfsy = config.sfsy
-        if env_cookie and sfsy:
-            cookies = env_cookie + "\n" + sfsy
+        si_cookie = getattr(config, 'sfsy', '') 
+        if env_cookie and si_cookie:
+            cookies = env_cookie + "\n" + si_cookie
         elif env_cookie:
             cookies = env_cookie
-        elif sfsy:
-            cookies = sfsy
+        elif si_cookie:
+            cookies = si_cookie
         else:
             print("请设置变量 export sfsy='' 或在 config.py 中设置 sfsy")
             sys.exit()
     except Exception as e:
-        print(f"获取环境变量时发生错误: {e}")  
+        print("请设置变量 export sfsy='' 或在 config.py 中设置 sfsy")
         sys.exit()
-
     list_cookie = re.split(r'\n', cookies)
     total_cookies = len(list_cookie)
     
@@ -474,5 +472,6 @@ def sicxs():
             print(f"执行账号【{i + 1}】时发生错误: {e}")
 
     print(f'\n-----------  执 行  结 束 -----------')
+
 if __name__ == '__main__':
    sicxs()
