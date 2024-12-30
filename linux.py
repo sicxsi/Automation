@@ -1,9 +1,10 @@
 # name: linux do
 # Author: sicxs
 # Date: 2024-11-25
-# export wy_linux="账号#密码"
+# export wy_linux="cookie"
 # 换行，# 分割 
 # 功能:登录，浏览任务
+# 请在ip常用地使用
 # cron: 20 8 * * *
 # new Env('linux do');
 
