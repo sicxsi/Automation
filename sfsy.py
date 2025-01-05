@@ -330,7 +330,7 @@ def sf_fm_b(): #蜂蜜大冒险扩容
     print(f'成功扩容{info["obj"]}容量')
    else: 
     print(f'扩容失败') 
-def sf_fm_e1():
+def sf_fm_e1(): #暂留
      header = test_header()
      url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~receiveExchangeGameService~gameStatus"
      data = {}
@@ -352,32 +352,30 @@ def sf_fm_f(): # 蜂蜜任务列表
             task_type = task.get('taskType', '')
             status = task.get('status', '')
             task_code = task.get('taskCode', '')
-            sf.append({
-                'task_type': task_type,
-                'status': status,
-                'task_code': task_code
-            })
+            jumpTo = task.get('jumpTo', '')
+            if task_type == 'BROWSER_CENTER_TASK_TYPE' and status == 1:
+              sf.append({
+                    'task_type': task_type,
+                    'status': status,
+                    'task_code': task_code,
+                    'jumpTo': jumpTo
+                })
         return sf
     else:
         print("获取失败")
+        return None
 def sf_fm_c(): #蜂蜜浏览任务
-   header = test_header()
-   url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberEs~taskRecord~finishTask"
-   taskCode = [
-    'B2BFB7A7D4F94400987C0821AD5D983B'
-   ]
-   for code in taskCode:
-      data = {
-         "taskCode": code
-         }
-      response = s.post(url, headers=header,json=data)
-      random_pause()
-      response.encoding = "utf-8"
-      info = json.loads(response.text)
-      if info['obj']:
-       print(f"任务完成")
+   header = test_getSign()
+   s1 = sf_fm_f()
+   for code in s1:
+      url = code['jumpTo']
+      response = s.get(url, headers=header)
+      s2 = response.status_code 
+      if s2 == 200:
+        random_pause()
+        print(f"任务完成")
       else:
-       print("任务失败")
+        print(f"任务失败")  
 def sf_fm_d():#蜂蜜浏览任务领取
    header = test_header()   
    url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~receiveExchangeIndexService~receiveHoney"
@@ -394,7 +392,6 @@ def sf_fm_d():#蜂蜜浏览任务领取
       time.sleep(2)
       response.encoding = "utf-8"  
       info = json.loads(response.text)
-      print(i,info)
       if info['success']:
         print(f"领取成功")
       else:
@@ -438,7 +435,6 @@ def index(url):
      sf_b()
      time.sleep(2)
      print("开始蜂蜜游戏")
-     sf_fm_e1()
      print(f"账号[{login_mobile}]任务执行前蜂蜜：{sf_fm_e()}")
      sf_fm_a()
      sf_fm_c()
