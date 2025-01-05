@@ -55,6 +55,7 @@ def test_header():#蜂蜜 heaaders + sign
             'timestamp': timestamp,
             'signature': correct_signature
         }
+        
         return headers
 def get_deviceId(characters='abcdef0123456789'):# 随机设备
         result = ''
@@ -281,25 +282,25 @@ def sf_hyr_f():#会员日领取浏览任务
       "BROWSE_VIP_CENTER"
    ]
    for i in taskType:
-    data = {
-    "taskType": i,
-    "activityCode": "MEMBER_DAY",
-    "channelType": "MINI_PROGRAM"
-     }
-    response = requests.post(url=url,json=data,headers=header)
-    response.encoding = "utf-8"
-    random_pause()
-    info = json.loads(response.text)
-    if info['success']:
-       print("领取成功")
-    else:
-       print("领取失败")   
+     data = {
+        "taskType": i,
+        "activityCode": "MEMBER_DAY",
+        "channelType": "MINI_PROGRAM"
+        }
+     response = requests.post(url=url,json=data,headers=header)
+     response.encoding = "utf-8"
+     random_pause()
+     info = json.loads(response.text)
+     if info['success']:
+        print("领取成功")
+     else:
+        print("领取失败")   
 
 def sf_fm_a(): #蜂蜜大冒险
     gameNum = 5
     header = test_header()
     for i in range(1,gameNum):
-     data = {'gatherHoney': 20, }
+     data = {"gatherHoney":20}
      if gameNum < 0: break
      print(f'开始第{i}次大冒险')
      url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~receiveExchangeGameService~gameReport'
@@ -329,7 +330,14 @@ def sf_fm_b(): #蜂蜜大冒险扩容
     print(f'成功扩容{info["obj"]}容量')
    else: 
     print(f'扩容失败') 
-
+def sf_fm_e1():
+     header = test_header()
+     url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~receiveExchangeGameService~gameStatus"
+     data = {}
+     response = s.post(url, headers=header, json=data)
+     response.encoding = "utf-8"
+     info = json.loads(response.text)
+     print(info)
 def sf_fm_f(): # 蜂蜜任务列表
     header = test_header()
     url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~receiveExchangeIndexService~taskDetail"
@@ -356,7 +364,7 @@ def sf_fm_c(): #蜂蜜浏览任务
    header = test_header()
    url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberEs~taskRecord~finishTask"
    taskCode = [
-    "B2BFB7A7D4F94400987C0821AD5D983B",
+    'B2BFB7A7D4F94400987C0821AD5D983B'
    ]
    for code in taskCode:
       data = {
@@ -374,20 +382,23 @@ def sf_fm_d():#蜂蜜浏览任务领取
    header = test_header()   
    url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~receiveExchangeIndexService~receiveHoney"
    taskType = [
-    "BROWSER_CENTER_TASK_TYPE",
+    'BROWSER_CENTER_TASK_TYPE',
+    'GATHER_HONEY_INIT_TASK_TYPE',
+    'BEES_GAME_TASK_TYPE',
    ]
    for i in taskType:
       data = {
          "taskType": i
     }
-   response = s.post(url=url,json=data,headers=header)
-   time.sleep(2)
-   response.encoding = "utf-8"  
-   info = json.loads(response.text)
-   if info['success']:
-       print(f"领取成功")
-   else:
-       print("领取失败")
+      response = s.post(url=url,json=data,headers=header)
+      time.sleep(2)
+      response.encoding = "utf-8"  
+      info = json.loads(response.text)
+      print(i,info)
+      if info['success']:
+        print(f"领取成功")
+      else:
+         print("领取失败")
 def sf_fm_e():# 蜂蜜积分
    header = test_header()
    url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~receiveExchangeIndexService~detail"
@@ -427,6 +438,7 @@ def index(url):
      sf_b()
      time.sleep(2)
      print("开始蜂蜜游戏")
+     sf_fm_e1()
      print(f"账号[{login_mobile}]任务执行前蜂蜜：{sf_fm_e()}")
      sf_fm_a()
      sf_fm_c()
@@ -447,6 +459,7 @@ def index(url):
 def sicxs():
     # 从系统环境变量获取cookie
     try:
+        os.environ
         env_cookie = os.environ.get("sfsy")
         si_cookie = getattr(config, 'sfsy', '') 
         if env_cookie and si_cookie:
