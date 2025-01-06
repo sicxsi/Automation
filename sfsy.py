@@ -410,6 +410,95 @@ def sf_fm_e():# 蜂蜜积分
      return info['obj']['usableHoney']
    else:
       print(info)
+
+def sf_cs_a():# 财神抽卡
+     header = test_getSign()
+     sfcs = sf_cs_e()
+     filtered_tasks = [task for task in sfcs if task['currency'] in ['WEALTH_CHANCE']]
+     print("开始财神抽卡")
+     for task in filtered_tasks:
+        s1 = task['balance']
+        print(f"当前抽卡次数:{s1}")
+        for i in range(s1):
+            url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~yearEnd2024WealthCardService~fortuneWealth"
+            data = { }
+            response = s.post(url, json=data, headers=header)
+            time.sleep(5)
+            response.encoding = "utf-8"
+            info = json.loads(response.text)
+            print(f"正在抽卡：第{i+1}次")
+def sf_cs_b():# 财神任务列表  此处只写两个任务
+   header = test_getSign()
+   url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~activityTaskService~taskList"
+   data = {"activityCode":"YEAREND_2024","channelType":"MINI_PROGRAM"}
+   response = s.post(url, json=data, headers=header)
+   response.encoding = "utf-8"
+   sf = []
+   info = json.loads(response.text)
+   if info['success']:
+     tasks = info['obj']
+     filtered_tasks = [task for task in tasks if task['taskType'] in ['BROWSE_VIP_CENTER', 'BROWSE_ANNUAL_REPORT']]
+     for task in filtered_tasks:
+        sf.append(task)
+   else:
+      print("获取失败")
+   return sf  
+def sf_cs_c():# 财神-套财神
+   header = test_getSign()
+   url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~yearEnd2024GameService~win"
+   print("开始套财神15关")
+   for levelIndex in range(1, 16):
+    data = {
+    "levelIndex": levelIndex}
+    random_pause()
+    response = s.post(url, json=data, headers=header)
+    response.encoding = "utf-8"
+    info = json.loads(response.text)
+    if info['success']:
+      print(f"第{levelIndex}关成功")
+    else:
+      print(info)
+
+def sf_cs_d():# 财神-浏览任务奖励
+   header = test_getSign()
+   sfcs = sf_cs_b()
+   print("开始领取财神任务奖励")
+   for code in sfcs:
+    url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberEs~taskRecord~finishTask"
+    data = {"taskCode":code['taskCode']}
+    response = s.post(url, json=data, headers=header)
+    response.encoding = "utf-8"
+    info = json.loads(response.text)
+    if info['success']:
+      time.sleep(5)
+      print(f"任务完成")
+    else:
+      print(info)
+
+def sf_cs_e():# 财神-信息
+   header = test_getSign()
+   url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~yearEnd2024TaskService~fetchTasksReward"
+   data = {}
+   response = s.post(url,json=data, headers=header)
+   response.encoding = "utf-8"
+   info = json.loads(response.text)
+   if info['success']:
+    return info['obj']['currentAccountList']  
+   else:
+    print(info)
+def sf_cs_f():# 财神-浏览任务
+   header = test_getSign()
+   sfcs = sf_cs_b()
+   print("开始浏览财神任务")
+   for code in sfcs:
+    url = code['buttonRedirect']
+    response = s.get(url, headers=header)
+    s2 = response.status_code 
+    if s2 == 200:
+        random_pause()
+        print(f"任务完成")
+    else:
+        print(f"任务失败")  
 def index(url):
     try:
      url = url  
@@ -440,6 +529,12 @@ def index(url):
      sf_fm_c()
      sf_fm_d()
      print(f"账号[{login_mobile}]任务执行后蜂蜜：{sf_fm_e()}")
+     sf_cs_f()
+     sf_cs_d()
+     sf_cs_c()
+     sf_cs_a()
+     sfsycs = sf_cs_e()
+     print(sfsycs)
      if day in [26, 27, 28]:
          print("开始会员日任务")
          sf_hyr_a()
@@ -449,6 +544,7 @@ def index(url):
          sf_hyr_f()
          print("再次检测红包数量")
          sf_hyr_c()
+
      print(f"账号[{login_mobile}]任务执行后积分：{sf_a()}")
     except Exception as e:
         print(e)
