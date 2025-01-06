@@ -69,7 +69,7 @@ def get_deviceId(characters='abcdef0123456789'):# 随机设备
         return result
 def random_pause():#随机时间 35-40
     # 生成一个 30 到 40 秒之间的随机时间
-    pause_time = random.uniform(35, 40)
+    pause_time = random.uniform(20, 30)
     time.sleep(pause_time)
 def sf_a():#积分
     url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~integralTaskStrategyService~queryPointTaskAndSignFromES"
@@ -106,26 +106,25 @@ def sf_b():#做任务浏览任务
      "taskCode": code['taskCode']
         }
      response = s.post(url, headers=header,json=data)
-     random_pause()
      response.encoding = "utf-8"
+     strategyId = code['strategyId']
+     title = code['title']
+     taskId =code['taskId']
+     taskCode = code['taskCode']
+     awardIntegral = code['awardIntegral']
+     status = code['status']
+     skip_title = ['用行业模板寄件下单', '去新增一个收件偏好', '参与积分活动','用积分兑任意礼品','领任意生活特权福利','设置你的顺丰ID',]
+     if status == 3:
+            print(f'{title}-已完成')
+            continue
+     if title in skip_title:
+            print(f'{title}-跳过')
+            continue
      info = json.loads(response.text)
      if info['success']:
          print(f"开始{code['title']}任务")
-         strategyId = code['strategyId']
-         title = code['title']
-         taskId =code['taskId']
-         taskCode = code['taskCode']
-         awardIntegral = code['awardIntegral']
-         status = code['status']
-         skip_title = ['用行业模板寄件下单', '去新增一个收件偏好', '参与积分活动','用积分兑任意礼品','领任意生活特权福利','设置你的顺丰ID',]
-         if status == 3:
-            print(f'{title}-已完成')
-            continue
-         if title in skip_title:
-            print(f'{title}-跳过')
-            continue
-         else:
-          sf_b_a(strategyId,title,taskId,taskCode,awardIntegral)
+         random_pause()
+         sf_b_a(strategyId,title,taskId,taskCode,awardIntegral)
      else:
         print("任务失败")       
 def sf_b_a(strategyId,title,taskId,taskCode,awardIntegral):#做任务浏览任务领取奖励
@@ -305,13 +304,12 @@ def sf_fm_a(): #蜂蜜大冒险
      print(f'开始第{i}次大冒险')
      url = 'https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~receiveExchangeGameService~gameReport'
      response =s.post(url, headers=header,json=data)
-     random_pause()
+     time.sleep(random.uniform(5, 10))
      response.encoding = "utf-8"
      info = json.loads(response.text)
      if info['success']:
         gameNum = info['obj']['gameNum']
         print(f'大冒险成功，剩余次数{gameNum}')
-        time.sleep(2)
         gameNum -= 1
      elif info["errorMessage"] == '容量不足':
         print(f'需要扩容')
@@ -372,7 +370,7 @@ def sf_fm_c(): #蜂蜜浏览任务
       response = s.get(url, headers=header)
       s2 = response.status_code 
       if s2 == 200:
-        random_pause()
+        time.sleep(random.uniform(15, 18))
         print(f"任务完成")
       else:
         print(f"任务失败")  
@@ -423,7 +421,7 @@ def sf_cs_a():# 财神抽卡
             url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~yearEnd2024WealthCardService~fortuneWealth"
             data = { }
             response = s.post(url, json=data, headers=header)
-            time.sleep(5)
+            time.sleep(random.uniform(3, 5))
             response.encoding = "utf-8"
             info = json.loads(response.text)
             print(f"正在抽卡：第{i+1}次")
@@ -450,7 +448,7 @@ def sf_cs_c():# 财神-套财神
    for levelIndex in range(1, 16):
     data = {
     "levelIndex": levelIndex}
-    random_pause()
+    time.sleep(random.uniform(10, 15))
     response = s.post(url, json=data, headers=header)
     response.encoding = "utf-8"
     info = json.loads(response.text)
