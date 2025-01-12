@@ -3,7 +3,7 @@
 # Date: 2025-1-12
 # 微信小程序
 # export wx_ddhs="token" 
-# 抓小程序auth和username值
+# 抓小程序token值
 # 多号 @,&分割 
 # cron: 25 8 * * *
 # new Env('铛铛回收');
