@@ -69,8 +69,8 @@ def qiandao(s_auth,s_username): #签到
 
 def sicxs():
     try:
-        env_cookie = os.environ.get("wx_ddjz")
-        si_cookie = getattr(config, 'wx_ddjz', '') 
+        env_cookie = os.environ.get("wx_bjyhs")
+        si_cookie = getattr(config, 'wx_bjyhs', '') 
         if env_cookie and si_cookie:
             cookies = env_cookie + "\n" + si_cookie
         elif env_cookie:
@@ -78,10 +78,10 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wx_ddjz='' 或在 config.py 中设置 wx_ddjz =")
+            print("请设置变量 export wx_bjyhs'' 或在 config.py 中设置  wx_bjyhs =")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export wx_ddjz='' 或在 config.py 中设置 wx_ddjz =")
+        print("请设置变量 export  wx_bjyhs'' 或在 config.py 中设置  wx_bjyhs =")
         sys.exit()
 
     list_cookie = re.split(r'\n|&|@', cookies)
