@@ -14,6 +14,9 @@ import os,json,sys,time,config,re
 
 def index(tonken):
     headers = {
+        "authority": "vues.dd1x.cn",
+        "method": "GET",
+        "path": "/front/activity/update_lottery_result?id=2674346",
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 MicroMessenger/7.0.20.1781(0x6700143B) NetType/WIFI MiniProgramEnv/Windows WindowsWechat/WMPF WindowsWechat(0x63090a1b) XWEB/8555',
         'xweb_xhr': '1',
         'token': tonken ,
