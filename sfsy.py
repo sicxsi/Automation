@@ -67,9 +67,8 @@ def get_deviceId(characters='abcdef0123456789'):# 随机设备
             else:
                 result += char
         return result
-def random_pause():#随机时间 35-40
-    # 生成一个 30 到 40 秒之间的随机时间
-    pause_time = random.uniform(20, 30)
+def random_pause():#随机时间 
+    pause_time = random.uniform(20, 25)
     time.sleep(pause_time)
 def sf_a():#积分
     url = "https://mcs-mimp-web.sf-express.com/mcs-mimp/commonPost/~memberNonactivity~integralTaskStrategyService~queryPointTaskAndSignFromES"
@@ -448,7 +447,7 @@ def sf_cs_c():# 财神-套财神
    for levelIndex in range(1, 16):
     data = {
     "levelIndex": levelIndex}
-    time.sleep(random.uniform(10, 15))
+    time.sleep(random.uniform(8, 12))
     response = s.post(url, json=data, headers=header)
     response.encoding = "utf-8"
     info = json.loads(response.text)
@@ -497,6 +496,22 @@ def sf_cs_f():# 财神-浏览任务
         print(f"任务完成")
     else:
         print(f"任务失败")  
+
+def sf_cs_g():# 财神-领取财神任务奖励
+    sfcs = sf_cs_e()
+    currency_to_god = {
+    'EAST_WEALTH': '东方财神',
+    'MIDDLE_WEALTH': '中财神',
+    'NORTH_WEALTH': '北方财神',
+    'SOUTH_WEALTH': '南方财神',
+    'WEST_WEALTH': '西方财神'
+}
+    balances = {god: 0 for god in currency_to_god.values()}
+    for item in sfcs:
+     if item['currency'] in currency_to_god:
+        balances[currency_to_god[item['currency']]] = item['balance']
+    return f"东方财神：{balances['东方财神']} 西方财神：{balances['西方财神']} 中财神：{balances['中财神']} 南方财神：{balances['南方财神']} 北方财神：{balances['北方财神']}"
+
 def index(url):
     try:
      url = url  
@@ -512,6 +527,8 @@ def index(url):
      print(f"登陆成功，用户名: {login_mobile}")
      current_time = time.localtime()
      day = current_time.tm_mday
+     time.sleep(random.uniform(3, 5))
+     print("******************积分任务********************")
      print(f"账号[{login_mobile}]任务执行前积分：{sf_a()}")
      time.sleep(2)
      sf_c()
@@ -521,19 +538,22 @@ def index(url):
      time.sleep(3)
      sf_b()
      time.sleep(2)
-     print("开始蜂蜜游戏")
+     print(f"账号[{login_mobile}]任务执行后积分：{sf_a()}")
+     print("******************收件兑奖任务********************")
      print(f"账号[{login_mobile}]任务执行前蜂蜜：{sf_fm_e()}")
      sf_fm_a()
      sf_fm_c()
      sf_fm_d()
      print(f"账号[{login_mobile}]任务执行后蜂蜜：{sf_fm_e()}")
+     print("******************财神任务********************")
+     print(f"账号[{login_mobile}]任务执行前财神卡：{sf_cs_g()}")
      sf_cs_f()
      sf_cs_d()
      sf_cs_c()
      sf_cs_a()
-     sfsycs = sf_cs_e()
-     print(sfsycs)
+     print(f"账号[{login_mobile}]任务执行后财神卡：{sf_cs_g()}")
      if day in [26, 27, 28]:
+         print("******************会员日任务********************")
          print("开始会员日任务")
          sf_hyr_a()
          sf_hyr_b()
@@ -542,8 +562,6 @@ def index(url):
          sf_hyr_f()
          print("再次检测红包数量")
          sf_hyr_c()
-
-     print(f"账号[{login_mobile}]任务执行后积分：{sf_a()}")
     except Exception as e:
         print(e)
 def sicxs():
