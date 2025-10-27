@@ -11,6 +11,13 @@
 import requests
 import os,sys,time
 import json,re
+from notify import send
+
+def pr(message):
+    msg.append(message + "\n")
+    print(message)
+
+msg = []
 
 def index(safe): #登录信息
     url = f"https://wxx.ball.warhorsechina.com.cn/api/getuserinfo.php?safe={safe}"
@@ -19,7 +26,7 @@ def index(safe): #登录信息
     response.encoding = "utf-8"
     info = json.loads(response.text)
     if 1 == info['status']:
-         print(f"登陆成功，用户名：{info['nickname']}")
+         pr(f"登陆成功，用户名：{info['nickname']}")
          infos(safe)
          print("签到")
          time.sleep(3)
@@ -99,9 +106,9 @@ def infos(safe): #积分，能量信息
     response.encoding = "utf-8"
     info = json.loads(response.text)
     if 1 == info['status']:
-         print(f"积分:{info['nowscore']}")       
+         pr(f"积分:{info['nowscore']}")       
     else:
-        print("失败")  
+        pr("失败")  
 
 def checkin(safe): #签到
     url = f"https://wxx.ball.warhorsechina.com.cn/api/checkin.php?safe={safe}"
@@ -348,7 +355,7 @@ def getques(safe): #刷新题库
          question =info['question']
          options =info['options']
          sicxs_tk_up(qid,question,options)
-         print(info)       
+       #  print(info)       
     else:
         print(info["msg"])  
        
@@ -434,7 +441,7 @@ def sicxs():
       import config  
     else:
       with open(config_path, 'w') as f: 
-        print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
+        pr("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
         f.write('#可以在此文件中添加配置变量，例如：\nsfsy = ""\n')
     try:
         env_cookie = os.environ.get("wx_zmnlxq")
@@ -446,16 +453,18 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wx_zmnlxq='' 或在 config.py 中设置 wx_zmnlxq")
+            pr("请设置变量 export wx_zmnlxq='' 或在 config.py 中设置 wx_zmnlxq")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export wx_zmnlxq='' 或在 config.py 中设置 wx_zmnlxq")
+        pr("请设置变量 export wx_zmnlxq='' 或在 config.py 中设置 wx_zmnlxq")
         sys.exit()
     list_cookie = re.split(r'\n|&|@', cookies)
     total_cookies = len(list_cookie)
     for i, list_cookie_i in enumerate(list_cookie):
         print(f'----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+        pr(f"账号【{i + 1}】开始执行")
         index(list_cookie_i)
+        send("战马能量星球", ''.join(msg))
     for i, list_cookie_i in enumerate(list_cookie):
         print(f'----------- 账号【{i + 1}/{total_cookies}】执行领取互助饲料 -----------')
         checkslgift(list_cookie_i)

@@ -11,12 +11,17 @@
 import requests
 import json,os,sys,re
 import hashlib,time
+from notify import send
 
 # md5 = "action=user&appkey=1079fb245839e765&merchant_id=2&method=center&username={wx_username}UppwYkfBlk"
 # md5_hash = hashlib.md5(md5.encode('utf-8')).hexdigest().upper().lower()
 # print(md5_hash) 
 # sign为固定值 
+def pr(message):
+    msg.append(message + "\n" )
+    pr(message)
 
+msg = []
 def index(wx_auth,wx_username): #登录信息
    url = f"https://www.52bjy.com/api/app/user.php?action=userinfo&app=hsywx&appkey=1079fb245839e765&auth={wx_auth}&merchant_id=2&username={wx_username}"
    header = {
@@ -33,12 +38,12 @@ def index(wx_auth,wx_username): #登录信息
    response.encoding = "utf-8"
    info = json.loads(response.text)
    if info['isSucess']:
-       print(f"登陆成功，用户名：{info['data']['nickname']}")
+       pr(f"登陆成功，用户名：{info['data']['nickname']}")
        md5 = f"action=user&app=hsywx&appkey=1079fb245839e765&merchant_id=2&method=qiandao&username={wx_username}&version=2UppwYkfBlk"
        wx_sign = hashlib.md5(md5.encode('utf-8')).hexdigest().upper().lower()
        qiandao(wx_username,wx_sign)
    else:
-       print(info['message'])    
+       pr(info['message'])    
 
 def qiandao(wx_username,wx_sign): #签到
     url = f"https://www.52bjy.com/api/app/hsy.php?action=user&app=hsywx&appkey=1079fb245839e765&merchant_id=2&method=qiandao&username={wx_username}&version=2&sign={wx_sign}"
@@ -59,11 +64,11 @@ def qiandao(wx_username,wx_sign): #签到
     md5 = f"action=user&appkey=1079fb245839e765&merchant_id=2&method=center&username={wx_username}UppwYkfBlk"
     wx_sign_info = hashlib.md5(md5.encode('utf-8')).hexdigest().upper().lower()
     if info['isSucess']:
-       print(info['message'])
-       print(f"签到红包：{info['data']['qiandao_award']}元，签到天数：{info['data']['double_award_days']}")
+       pr(info['message'])
+       pr(f"签到红包：{info['data']['qiandao_award']}元，签到天数：{info['data']['double_award_days']}")
        signinfo(wx_username,wx_sign_info)
     else:
-       print(info['message']) 
+       pr(info['message']) 
        signinfo(wx_username,wx_sign_info)
 def signinfo(wx_username,wx_sign_info): #红包
     url = f"https://www.52bjy.com/api/app/hsy.php?action=user&appkey=1079fb245839e765&merchant_id=2&method=center&username={wx_username}&sign={wx_sign_info}"
@@ -81,9 +86,9 @@ def signinfo(wx_username,wx_sign_info): #红包
     response.encoding = "utf-8"
     info = json.loads(response.text)
     if info['isSucess']:
-       print(f"红包总额：{info['data']['yuanbao']}元") 
+       pr(f"红包总额：{info['data']['yuanbao']}元") 
     else:
-        print(info)  
+        pr(info)  
 
 
 def sicxs():
@@ -92,7 +97,7 @@ def sicxs():
       import config  
     else:
       with open(config_path, 'w') as f: 
-        print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
+        pr("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
         f.write('#可以在此文件中添加配置变量，例如：\nsfsy = ""\n')
     try:
         env_cookie = os.environ.get("wx_hsyhs")
@@ -104,10 +109,10 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wx_hsyhs='' 或在 config.py 中设置 wx_hsyhs =")
+            pr("请设置变量 export wx_hsyhs='' 或在 config.py 中设置 wx_hsyhs =")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export wx_hsyhs='' 或在 config.py 中设置 wx_hsyhs =")
+        pr("请设置变量 export wx_hsyhs='' 或在 config.py 中设置 wx_hsyhs =")
         sys.exit()
 
     list_cookie = re.split(r'\n|&|@', cookies)
@@ -116,10 +121,12 @@ def sicxs():
     for i, list_cookie_i in enumerate(list_cookie):
         try:
             print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+            pr(f"账号【{i + 1}】开始执行：")
             list = list_cookie_i.split("#")
             index(list[0], list[1])
+            send("回收猿回收", ''.join(msg))
         except Exception as e:
-            print(f"账号【{i + 1}/{total_cookies}】执行出错")    
+            pr(f"账号【{i + 1}/{total_cookies}】执行出错")    
 
     print(f'\n-----------  执 行  结 束 -----------')
 

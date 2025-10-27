@@ -8,6 +8,13 @@
 import requests
 import re,os,sys
 import time
+from notify import send
+
+def pr(message):
+    msg.append(message+ "\n")
+    print(message)
+
+msg = []
 
 def index(cookie):
      url = 'https://www.haidan.video/index.php'
@@ -25,15 +32,15 @@ def index(cookie):
         time.sleep(3)
         info = response.text
         if "首页" in info:
-         print("登陆成功")
+         pr("登陆成功")
         
          signin(cookie)  
         else:
-         print("登录失败,等待10秒后重试")
+         pr("登录失败,等待10秒后重试")
          time.sleep(10)
          signin(cookie)  
      except Exception as e:
-          print("登录失败,请检查cookie是否正确")
+          pr("登录失败,请检查cookie是否正确")
 def signin(cookie):
      url = 'https://www.haidan.video/signin.php'
      header = {
@@ -51,11 +58,11 @@ def signin(cookie):
            
            torrents(cookie)
         else:
-           print("打卡失败？")  
+           pr("打卡失败？")  
         
      except Exception as e:
           
-          print("登录失败")
+          pr("登录失败")
           
 def torrents(cookie):
      url = 'https://www.haidan.video/torrents.php'
@@ -86,11 +93,11 @@ def torrents(cookie):
          matches2 = pattern3.findall(info)
          matches3 = pattern4.findall(info)
          matches4 = pattern5.findall(info)
-         print( "用户名：" + matches[0] + " 魔力值：" + matches2[0][1] + " 分享率" + matches1[0] +  " 上传量" + matches3[0] + " 下载量" + matches4[0])
+         pr( "用户名：" + matches[0] + " 魔力值：" + matches2[0][1] + " 分享率" + matches1[0] +  " 上传量" + matches3[0] + " 下载量" + matches4[0])
        else:
-         print("查询失败")
+         pr("查询失败")
      except Exception as e:
-         print("登陆失败")
+         pr("登陆失败")
 
 def sicxs():
     config_path = 'config.py'
@@ -98,7 +105,7 @@ def sicxs():
       import config  
     else:
       with open(config_path, 'w') as f: 
-        print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
+        pr("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
         f.write('#可以在此文件中添加配置变量，例如：\nsfsy = ""\n')
     try:
         env_cookie = os.environ.get("wy_haidan")
@@ -110,20 +117,22 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wy_haidan='' 或在 config.py 中设置 wy_haidan")
+            pr("请设置变量 export wy_haidan='' 或在 config.py 中设置 wy_haidan")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export wy_haidan='' 或在 config.py 中设置 wy_haidan")
+        pr("请设置变量 export wy_haidan='' 或在 config.py 中设置 wy_haidan")
         sys.exit()
     list_cookie = re.split(r'\n|&|@', cookies)
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):
         print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+        pr(f"账号【{i + 1}】开始执行：")
         try:
             index(list_cookie_i)
+            send("海胆PT站", ''.join(msg))
         except Exception as e:
-            print(f"执行账号【{i + 1}】时发生错误: {e}")
+            pr(f"执行账号【{i + 1}】时发生错误: {e}")
 
     print(f'\n-----------  执 行  结 束 -----------')
 

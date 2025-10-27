@@ -6,7 +6,13 @@
 # new Env('科技玩家');
 import requests
 import re,os,sys,json,time
+from notify import send
 
+def pr(message):
+    msg.append(message + "\n")
+    print(message)
+
+msg = []
 def logn(zhanghao,mima):
      url = "https://www.kejiwanjia.net/wp-json/jwt-auth/v1/token"
      header = {
@@ -38,7 +44,7 @@ def logn(zhanghao,mima):
         info = json.loads(response.text)
         return info['token']
      except Exception as e:
-          print(e)
+          pr(e)
 
 
 def getUserInfo(authorization):#我的信息
@@ -57,13 +63,13 @@ def getUserInfo(authorization):#我的信息
         response = requests.post(url=url,headers=header)
         response.encoding = "utf-8"
         info = json.loads(response.text)
-        print(f"用户名: {info['user_data']['name']}")
+        pr(f"用户名: {info['user_data']['name']}")
         time.sleep(3)
         getUserMission(authorization)
         time.sleep(5)
         userMission(authorization)  
     except Exception as e:
-          print(e)
+          pr(e)
 def getGoldList(authorization):#积分查询
     url = "https://www.kejiwanjia.net/wp-json/b2/v1/getGoldList"
     header = {
@@ -80,9 +86,9 @@ def getGoldList(authorization):#积分查询
         response = requests.post(url=url,headers=header)
         response.encoding = "utf-8"
         info = json.loads(response.text)
-        print(f"最近一次签到：{info['data'][0]['date']},获得积分；{info['data'][0]['no']},总积分：{info['data'][0]['total']}")
+        pr(f"最近一次签到：{info['data'][0]['date']},获得积分；{info['data'][0]['no']},总积分：{info['data'][0]['total']}")
     except Exception as e:
-          print(e)
+          pr(e)
 def getUserMission(authorization):#更新签到
     url = "https://www.kejiwanjia.net/wp-json/b2/v1/getUserMission"
     header = {
@@ -99,9 +105,9 @@ def getUserMission(authorization):#更新签到
         response = requests.post(url=url,headers=header)
         s1 = response.status_code 
         if 200 ==s1:
-            print("正在初始签到，请稍等。")
+            pr("正在初始签到，请稍等。")
     except Exception as e:
-          print(e)
+          pr(e)
 def userMission(authorization): #签到
     url = "https://www.kejiwanjia.net/wp-json/b2/v1/userMission"
     header = {
@@ -119,18 +125,18 @@ def userMission(authorization): #签到
         response.encoding = "utf-8"
         info = json.loads(response.text)
         if "message" in  info :
-          print("你的authorization可能过期了，请检查。")
+          pr("你的authorization可能过期了，请检查。")
         elif "credit" in info:
-          print(f"恭喜您，签到获得,{info['credit']}积分")
+          pr(f"恭喜您，签到获得,{info['credit']}积分")
           time.sleep(5)
           getGoldList(authorization)
         else:
-            print("请勿重复签到")
+            pr("请勿重复签到")
             time.sleep(5)
             getGoldList(authorization)  
-         #print(f"最近一次签到：{info['data'][0]['date']},获得积分；{info['data'][0]['no']},总积分：{info['data'][0]['total']}")
+         #pr(f"最近一次签到：{info['data'][0]['date']},获得积分；{info['data'][0]['no']},总积分：{info['data'][0]['total']}")
     except Exception as e:
-          print(e)
+          pr(e)
 
 def sicxs():
     config_path = 'config.py'
@@ -138,7 +144,7 @@ def sicxs():
       import config  
     else:
       with open(config_path, 'w') as f: 
-        print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
+        pr("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
         f.write('#可以在此文件中添加配置变量，例如：\nsfsy = ""\n')    
     try:
         env_cookie = os.environ.get("wy_kjwj")
@@ -150,10 +156,10 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wy_kjwj='' 或在 config.py 中设置 wy_kjwj =")
+            pr("请设置变量 export wy_kjwj='' 或在 config.py 中设置 wy_kjwj =")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export wy_kjwj='' 或在 config.py 中设置 wy_kjwj =")
+        pr("请设置变量 export wy_kjwj='' 或在 config.py 中设置 wy_kjwj =")
         sys.exit()
 
     list_cookie = re.split(r'\n|&', cookies)
@@ -166,7 +172,7 @@ def sicxs():
             authorization = logn(list[0], list[1])
             getUserInfo(authorization)
         except Exception as e:
-            print(f"账号【{i + 1}/{total_cookies}】执行出错")    
+            pr(f"账号【{i + 1}/{total_cookies}】执行出错")    
 
     print(f'\n-----------  执 行  结 束 -----------')
 

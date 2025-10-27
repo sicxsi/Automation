@@ -7,6 +7,14 @@
 # new Env('飞牛nas');
 import requests
 import re,os,sys
+from notify import send
+
+def pr(message):
+    msg.append(message + "\n")
+    print(message)
+
+msg = []
+
 
 def index(cookie):
      url = 'https://club.fnnas.com/plugin.php?id=zqlj_sign'
@@ -25,13 +33,13 @@ def index(cookie):
         info = response.text
         if "补签" in info: 
          pattern = re.compile(r'zqlj_sign&sign=(.*?)"')
-         print("开始签到")
+         pr("开始签到")
          matches = pattern.findall(info)
          sgin(cookie,matches[0])
         else:
-         print("登录失败,账户可能已过期")
+         pr("登录失败,账户可能已过期")
      except Exception as e:
-          print(e)
+          pr(e)
 def sgin(cookie,formhash):
      url = f'https://club.fnnas.com/plugin.php?id=zqlj_sign&sign={formhash}'
      header = {
@@ -49,16 +57,16 @@ def sgin(cookie,formhash):
         info = response.text
         if "您今天已经打过卡了，请勿重复操作！" in info:
          
-         print("您今天已经打过卡了，请勿重复操作！")  
+         pr("您今天已经打过卡了，请勿重复操作！")  
          my(cookie)
         elif "打卡成功"in info:
          
-         print("打卡成功")
+         pr("打卡成功")
 
          my(cookie)
 
      except Exception as e:
-          print(e)
+          pr(e)
 def my(cookie):
      url = 'https://club.fnnas.com/home.php'
      header = {
@@ -85,10 +93,10 @@ def my(cookie):
         matches3 = pattern4.findall(response.text)
 
 
-        print( "用户名：" + matches[0] + " 飞牛币：" + matches1[0] + " 登录天数：" + matches2[0] + " 金钱：" + matches3[0])
+        pr( "用户名：" + matches[0] + " 飞牛币：" + matches1[0] + " 登录天数：" + matches2[0] + " 金钱：" + matches3[0])
 
      except Exception as e:
-         print(e)
+         pr(e)
          
 def sicxs():
     config_path = 'config.py'
@@ -96,7 +104,7 @@ def sicxs():
       import config  
     else:
       with open(config_path, 'w') as f: 
-        print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
+        pr("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
         f.write('#可以在此文件中添加配置变量，例如：\nsfsy = ""\n')
     try:
         env_cookie = os.environ.get("wy_fnnas")
@@ -108,20 +116,22 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wy_fnnas='' 或在 config.py 中设置 wy_fnnas")
+            pr("请设置变量 export wy_fnnas='' 或在 config.py 中设置 wy_fnnas")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export wy_fnnas='' 或在 config.py 中设置 wy_fnnas")
+        pr("请设置变量 export wy_fnnas='' 或在 config.py 中设置 wy_fnnas")
         sys.exit()
     list_cookie = re.split(r'\n|&|@', cookies)
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):
         print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+        pr(f"账号【{i + 1}】开始执行：")
         try:
             index(list_cookie_i)
+            send("Fnnas论坛", ''.join(msg))
         except Exception as e:
-            print(f"执行账号【{i + 1}】时发生错误: {e}")
+            pr(f"执行账号【{i + 1}】时发生错误: {e}")
 
     print(f'\n-----------  执 行  结 束 -----------')
 
