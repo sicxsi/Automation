@@ -1,3 +1,10 @@
+# name: 隔壁网
+# Author: sicxs
+# Date: 2024-11-4
+# export wy_gebi="cookie" @,& 分割
+# cron: 25 8 * * *
+# new Env('隔壁网');
+
 import requests
 import time
 import re
