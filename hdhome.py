@@ -7,6 +7,13 @@
 import requests
 import re,time
 import os,sys
+from notify import send
+
+def pr(message):
+    msg.append(message + "\n")
+    print(message)
+
+msg = []
 
 s = requests.session()
 def index(cookie):
@@ -24,13 +31,13 @@ def index(cookie):
         time.sleep(3)
         info = response.text
         if "首页" in info:
-         print("登陆成功")
+         pr("登陆成功")
         
          attendance(cookie)  
         else:
-         print("登录失败")
+         pr("登录失败")
      except Exception as e:
-          print(e)
+          pr(e)
 def attendance(cookie):
      url = 'https://hdhome.org/attendance.php'
      header = {
@@ -46,13 +53,13 @@ def attendance(cookie):
         time.sleep(3)
         info = response.text
         if "签到已得" in info:
-         print("签到成功，请勿重复刷新。")
+         pr("签到成功，请勿重复刷新。")
          torrents(cookie)
         else :
-          print("签到中...")
+          pr("签到中...")
           attendance(cookie)
      except Exception as e:
-          print(e)
+          pr(e)
 def torrents(cookie):
     url = 'https://hdhome.org/torrents.php'
     header = {
@@ -77,7 +84,7 @@ def torrents(cookie):
     matches3 = pattern4.findall(response.text)
        
        
-    print( "用户名：" + matches[0][1] + " 魔力值：" + matches1[0] + " 签到已得：" + matches2[0]+ " 做种积分：" + matches3[0])
+    pr( "用户名：" + matches[0][1] + " 魔力值：" + matches1[0] + " 签到已得：" + matches2[0]+ " 做种积分：" + matches3[0])
 
 
 def sicxs():
@@ -86,7 +93,7 @@ def sicxs():
       import config  
     else:
       with open(config_path, 'w') as f: 
-        print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
+        pr("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
         f.write('#可以在此文件中添加配置变量，例如：\nsfsy = ""\n')
     try:
         env_cookie = os.environ.get("wy_hdhome")
@@ -98,20 +105,22 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wy_hdhome='' 或在 config.py 中设置 wy_hdhome")
+            pr("请设置变量 export wy_hdhome='' 或在 config.py 中设置 wy_hdhome")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export wy_hdhome='' 或在 config.py 中设置 wy_hdhome")
+        pr("请设置变量 export wy_hdhome='' 或在 config.py 中设置 wy_hdhome")
         sys.exit()
     list_cookie = re.split(r'\n|&|@', cookies)
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):
         print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+        pr(f"账号【{i + 1}】开始执行：")
         try:
             index(list_cookie_i)
+            send("家园PT站", ''.join(msg))
         except Exception as e:
-            print(f"执行账号【{i + 1}】时发生错误: {e}")
+            pr(f"执行账号【{i + 1}】时发生错误: {e}")
 
     print(f'\n-----------  执 行  结 束 -----------')
 

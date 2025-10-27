@@ -9,7 +9,12 @@ import requests
 import re,os,sys
 import time
 import random
+from notify import send
+def pr(message):
+    msg.append(message + "\n" )
+    print(message)
 
+msg = []
 def index(cookie): #登录
      url = 'https://hostloc.com/forum.php'
      header = {
@@ -25,7 +30,7 @@ def index(cookie): #登录
      try:
         response = requests.get(url=url,headers=header )
         if "积分" in response.text:
-         print("登陆成功")  
+         pr("登陆成功")  
          pattern = re.compile(r"discuz_uid = '(.*?)'")
          matches = pattern.findall(response.text)
          uid = str(matches[0])
@@ -33,9 +38,9 @@ def index(cookie): #登录
          time.sleep(5)
          my(cookie,uid)
         else:
-         print("登录失败")
+         pr("登录失败")
      except Exception as e:
-          print(e)
+          pr(e)
 
 def my(cookie,uid): #我的信息
      
@@ -64,7 +69,7 @@ def my(cookie,uid): #我的信息
      matches1 = pattern2.findall(response.text)
      matches2 = pattern3.findall(response.text)
 
-     print( "用户名：" + matches[0] + " 积分：" + matches1[0][0] + " 威望：" + matches1[0][1] + " 金钱：" + matches2[0])
+     pr( "用户名：" + matches[0] + " 积分：" + matches1[0][0] + " 威望：" + matches1[0][1] + " 金钱：" + matches2[0])
     
 
 def sicxs_task(cookie):#任务
@@ -85,11 +90,11 @@ def sicxs_task(cookie):#任务
         response = requests.get(url=url,headers=header)
         info = response.text
         if "个人资料"in info:
-            print(f"第{i}次访问{uuid}用户成功")
+            pr(f"第{i}次访问{uuid}用户成功")
         elif "您指定的用户空间不存在" in info:
-            print("访问失败，重试中")
+            pr("访问失败，重试中")
         else:
-            print("访问失败，重试中")
+            pr("访问失败，重试中")
 
 
 
@@ -100,7 +105,7 @@ def sicxs():
       import config  
     else:
       with open(config_path, 'w') as f: 
-        print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
+        pr("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
         f.write('#可以在此文件中添加配置变量，例如：\nsfsy = ""\n')       
     try:
         env_cookie = os.environ.get("wy_hostloc")
@@ -112,20 +117,22 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wy_hostloc='' 或在 config.py 中设置 wy_hostloc")
+            pr("请设置变量 export wy_hostloc='' 或在 config.py 中设置 wy_hostloc")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export wy_hostloc='' 或在 config.py 中设置 wy_hostloc")
+        pr("请设置变量 export wy_hostloc='' 或在 config.py 中设置 wy_hostloc")
         sys.exit()
     list_cookie = re.split(r'\n|&|@', cookies)
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):
         print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+        pr(f"账号【{i + 1}】开始执行：")
         try:
             index(list_cookie_i)
+            send("全球主机论坛", ''.join(msg))
         except Exception as e:
-            print(f"执行账号【{i + 1}】时发生错误: {e}")
+            pr(f"执行账号【{i + 1}】时发生错误: {e}")
 
     print(f'\n-----------  执 行  结 束 -----------')
 

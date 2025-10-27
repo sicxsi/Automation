@@ -12,6 +12,14 @@
 import requests
 import json,os,sys,re
 import time
+from notify import send
+
+def pr(message):
+    msg.append(message + "\n")
+    print(message)
+
+msg = []
+
 def index(sso):#登录信息
     current_time = time.localtime()
     current_weekday = current_time.tm_wday
@@ -30,7 +38,7 @@ def index(sso):#登录信息
     response.encoding = "utf-8"
     info = json.loads(response.text)
     if 0 == info['code']:
-        print(f"登陆成功，用户名：{info['data']['nickname']},积分：{info['data']['integral']}")
+        pr(f"登陆成功，用户名：{info['data']['nickname']},积分：{info['data']['integral']}")
         qx_gz_id = info['data']['id']
         print("开始签到")
         xy_qiandao(sso)
@@ -485,9 +493,9 @@ def xy_info(sso): #积分
     response.encoding = "utf-8"
     info = json.loads(response.text)
     if 0 == info['code']:
-        print(f"任务已完成，用户名：{info['data']['nickname']},积分：{info['data']['integral']}")
+        pr(f"任务已完成，用户名：{info['data']['nickname']},积分：{info['data']['integral']}")
     else:
-       print(info['msg'])  
+       pr(info['msg'])  
 
 def sicxs():
     config_path = 'config.py'
@@ -495,7 +503,7 @@ def sicxs():
       import config  
     else:
       with open(config_path, 'w') as f: 
-        print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
+        pr("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
         f.write('#可以在此文件中添加配置变量，例如：\nsfsy = ""\n')
     try:
         env_cookie = os.environ.get("wx_xx")
@@ -507,18 +515,20 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wx_xx='' 或在 config.py 中设置 wx_xx")
+            pr("请设置变量 export wx_xx='' 或在 config.py 中设置 wx_xx")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export wx_xx='' 或在 config.py 中设置 wx_xx")
+        pr("请设置变量 export wx_xx='' 或在 config.py 中设置 wx_xx")
         sys.exit()
     list_cookie = re.split(r'\n|&|@', cookies)
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):
         print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+        pr(f'开始执行账号【{i + 1}】')
         try:
             index(list_cookie_i)
+            send("心喜", ''.join(msg))
         except Exception as e:
             print(f"执行账号【{i + 1}】时发生错误: {e}")
 

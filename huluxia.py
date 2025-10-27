@@ -6,11 +6,17 @@
 # 功能:签到
 # cron: 18 8 * * *
 # new Env('葫芦侠三楼');
+from notify import send
 
 import json
 import hashlib
 import requests,random
 import time,re,os,sys
+def pr(message):
+    msg.append(message +  "\n")
+    print(message)
+
+msg = []
 def index(username,password): #登录信息
     password = hashlib.md5(password.encode('utf-8')).hexdigest()
     sign = "account" + username + "device_code[d]b305cc73-8db8-4a25-886f-e73c502b1e99password" + password + "voice_codefa1c28a5b62e79c3e63d9030b6142e4b"
@@ -26,11 +32,11 @@ def index(username,password): #登录信息
     response.encoding = "utf-8"
     info = json.loads(response.text)    
     key = info['_key']
-    print(f"登陆成功，用户名：{info['user']['nick']}")
+    pr(f"登陆成功，用户名：{info['user']['nick']}")
     app_qiandao(key)
     
 def app_qiandao(key): #签到
-    print("开始执行签到任务...")
+    pr("开始执行签到任务...")
     id = app_list()
     for i in id:
       timestamp = int(time.time() * 1000)
@@ -50,10 +56,10 @@ def app_qiandao(key): #签到
       response.encoding = "utf-8"
       info = json.loads(response.text)  
       if 1 == info['status']:
-          print(f"{i[1]} 签到成功，获得{info['experienceVal']}点经验")
+          pr(f"{i[1]} 签到成功，获得{info['experienceVal']}点经验")
       else:
-         print(f"{i[1]},{info['msg']}")
-    print("签到完成")
+         pr(f"{i[1]},{info['msg']}")
+    pr("签到完成")
 def app_list(): #板块列表
     list = []
     url = f"https://floor.huluxia.com/category/list/ANDROID/4.2.3?"
@@ -76,7 +82,7 @@ def app_list(): #板块列表
         title = i['title']
         list.append((id,title))
     else:
-      print("获取失败")
+      pr("获取失败")
     return list  
 
 def sicxs():
@@ -85,7 +91,7 @@ def sicxs():
       import config  
     else:
       with open(config_path, 'w') as f: 
-        print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
+        pr("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
         f.write('#可以在此文件中添加配置变量，例如：\nsfsy = ""\n')
     try:
         env_cookie = os.environ.get("app_hlx")
@@ -97,10 +103,10 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export app_hlx='' 或在 config.py 中设置 app_hlx =")
+            pr("请设置变量 export app_hlx='' 或在 config.py 中设置 app_hlx =")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export app_hlx='' 或在 config.py 中设置 app_hlx =")
+        pr("请设置变量 export app_hlx='' 或在 config.py 中设置 app_hlx =")
         sys.exit()
 
     list_cookie = re.split(r'\n|&', cookies)
@@ -109,12 +115,14 @@ def sicxs():
     for i, list_cookie_i in enumerate(list_cookie):
         try:
             print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+            pr(f"账号【{i + 1}】开始执行：")
             list = list_cookie_i.split("#")
             index(list[0], list[1])
+            send("葫芦侠三楼", ''.join(msg))
         except Exception as e:
             print(f"账号【{i + 1}/{total_cookies}】执行出错")    
 
-    print(f'\n-----------  执 行  结 束 -----------')
+    pr(f'\n-----------  执 行  结 束 -----------')
 
 if __name__ == '__main__':
    sicxs()

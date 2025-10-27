@@ -8,7 +8,13 @@
 import requests
 import re,time
 import os,sys,json
+from notify import send
 
+def pr(message):
+    msg.append(message + "\n" )
+    print(message)
+
+msg = []
 def index(cookie): #登录
     url = "https://bbs.125.la/plugin.php?id=dsu_paulsign:sign"
     header = {
@@ -29,15 +35,15 @@ def index(cookie): #登录
     response.encoding = "utf-8"
     info = response.text
     if "你需要登录" in info:
-        print("cookie失效")
+        pr("cookie失效")
     else:
-        print("登陆成功")  
+        pr("登陆成功")  
         time.sleep(3)
         pattern = re.compile(r'uid=(.*?)" target="_blank" title="访问我的空间">(.*?)</a>')
         pattern1 = re.compile(r'formhash=(.*?)">退出</a>')
         matches = pattern.findall(info) 
         matches1 = pattern1.findall(info)
-        print(f"用户名: {matches[0][1]}")
+        pr(f"用户名: {matches[0][1]}")
         hash = matches1[0]
         id = matches[0][0]
         qiandao(cookie,hash)
@@ -73,7 +79,7 @@ def infoo(cookie,id):#我的信息
     matches2 = pattern2.findall(info) 
     matches3 = pattern3.findall(info) 
 
-    print(f"积分: {matches[0]} 精币: {matches1[0]} 荣誉: {matches2[0]} 签到累计天数: {matches3[0][0]} 本月签到天数: {matches3[0][2]} 连续签到天数: {matches3[0][1]} ")
+    pr(f"积分: {matches[0]} 精币: {matches1[0]} 荣誉: {matches2[0]} 签到累计天数: {matches3[0][0]} 本月签到天数: {matches3[0][2]} 连续签到天数: {matches3[0][1]} ")
 
 def qiandao(cookie,hash):#签到
     url = f"https://bbs.125.la/plugin.php?id=dsu_paulsign:sign&operation=qiandao&infloat=1"
@@ -95,7 +101,7 @@ def qiandao(cookie,hash):#签到
     response = requests.post(url=url,headers=header,data=data)
     response.encoding = "utf-8"
     info = json.loads(response.text)    
-    print("签到成功")
+    pr("签到成功")
 
 def sicxs():
     config_path = 'config.py'
@@ -103,7 +109,7 @@ def sicxs():
       import config  
     else:
       with open(config_path, 'w') as f: 
-        print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
+        pr("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
         f.write('#可以在此文件中添加配置变量，例如：\nsfsy = ""\n')
     try:
         env_cookie = os.environ.get("wy_jylt")
@@ -115,10 +121,10 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wy_jylt='' 或在 config.py 中设置 wy_jylt")
+            pr("请设置变量 export wy_jylt='' 或在 config.py 中设置 wy_jylt")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export wy_jylt='' 或在 config.py 中设置 wy_jylt")
+        pr("请设置变量 export wy_jylt='' 或在 config.py 中设置 wy_jylt")
         sys.exit()
     list_cookie = re.split(r'\n|&|@', cookies)
     total_cookies = len(list_cookie)
@@ -128,7 +134,7 @@ def sicxs():
         try:
             index(list_cookie_i)
         except Exception as e:
-            print(f"执行账号【{i + 1}】时发生错误: {e}")
+            pr(f"执行账号【{i + 1}】时发生错误: {e}")
 
     print(f'\n-----------  执 行  结 束 -----------')
 

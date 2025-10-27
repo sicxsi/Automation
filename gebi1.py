@@ -10,6 +10,14 @@ import time
 import re
 import os
 import sys
+from notify import send
+
+def pr(message):
+    msg.append(message+ "\n")
+    pr(message)
+
+msg = []
+
 def index(username, password):  # 登录
     url = "https://gebi1.com/member.php"
 
@@ -48,12 +56,12 @@ def index(username, password):  # 登录
         matches = pattern.findall(response.text)
         if matches:
             cookies = response.cookies
-            print(f"登录成功，用户名：{matches[0][0]}")
+            pr(f"登录成功，用户名：{matches[0][0]}")
             time.sleep(2)
             
             sign(matches[0][2],cookies)
     else:
-        print("登录失败，请检查账号密码是否正确")
+        pr("登录失败，请检查账号密码是否正确")
         sys.exit()
 
 def formhash(cookies):
@@ -65,7 +73,7 @@ def formhash(cookies):
         matches = pattern.findall(info)
         return matches[0]
     except Exception as e:
-        print(e)
+        pr(e)
 def sign(uid,cookies):
 
     url = "https://www.gebi1.cn/plugin.php"
@@ -89,13 +97,13 @@ def sign(uid,cookies):
         response = requests.get(url, params=params,headers=headers,cookies=cookies)
         info = response.text
         if "今日已签" in info:
-            print("签到成功")
+            pr("签到成功")
             time.sleep(5)
             my(uid, headers)
         else:
-            print("签到失败")
+            pr("签到失败")
     except Exception as e:
-        print(e)
+        pr(e)
 
 
 def my(uid, headers,cookies):
@@ -114,10 +122,10 @@ def my(uid, headers,cookies):
         matches2 = pattern2.findall(info)
         matches3 = pattern3.findall(info)
 
-        print(f"丝瓜：{matches2[0]},经验：{matches1[0]},贡献：{matches3[0]},积分：{matches[0]}")
+        pr(f"丝瓜：{matches2[0]},经验：{matches1[0]},贡献：{matches3[0]},积分：{matches[0]}")
 
     except Exception as e:
-        print(e)
+        pr(e)
 
 
 def sicxs():
@@ -126,7 +134,7 @@ def sicxs():
       import config  
     else:
       with open(config_path, 'w') as f: 
-        print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
+        pr("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
         f.write('#可以在此文件中添加配置变量，例如：\nsfsy = ""\n')
     try:
         env_cookie = os.environ.get("wy_gebi")
@@ -138,10 +146,10 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wy_gebi='' 或在 config.py 中设置 wy_gebi")
+            pr("请设置变量 export wy_gebi='' 或在 config.py 中设置 wy_gebi")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export wy_gebi='' 或在 config.py 中设置 wy_gebi")
+        pr("请设置变量 export wy_gebi='' 或在 config.py 中设置 wy_gebi")
         sys.exit()
     
     list_cookie = re.split(r'\n|&', cookies)
@@ -149,11 +157,13 @@ def sicxs():
     
     for i, list_cookie_i in enumerate(list_cookie):
         print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+        pr(f"账号【{i + 1}】开始执行：")
         try:
             list = list_cookie_i.split("#")
             index(list[0], list[1])
+            send("隔壁网论坛", ''.join(msg))
         except Exception as e:
-            print(f"执行账号【{i + 1}】时发生错误: {e}")
+            pr(f"执行账号【{i + 1}】时发生错误: {e}")
 
     print(f'\n----------- 执 行 结 束 -----------')
 

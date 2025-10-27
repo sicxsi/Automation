@@ -11,7 +11,13 @@ import json
 import hashlib
 import requests
 import time,re,os,sys
+from notify import send
 
+def pr(message):
+    msg.append(message + "\n" )
+    print(message)
+
+msg = []
 
 def headerds():#请求头
   headerds =  {
@@ -46,11 +52,11 @@ def wy_info(useradmin,password): #登录
    response.encoding = "utf-8"
    info = json.loads(response.text)
    if info['status'] == "404":
-       print("账号或密码错误")
+       pr("账号或密码错误")
    elif info['status'] == "200":
         return info['token']
    else:
-       print("登录失败")
+       pr("登录失败")
 def index(useradmin,password): #登录信息
     url = "https://https.ghs.wiki:7002/API?void=post"
     headerd = headerds()
@@ -62,9 +68,9 @@ def index(useradmin,password): #登录信息
     response = requests.post(url, json=data, headers=headerd)
     response.encoding = "utf-8"
     info = json.loads(response.text)
-    print(f"用户名：{info['userInfo']['username']} 积分：{info['userInfo']['silver']}")
+    pr(f"用户名：{info['userInfo']['username']} 积分：{info['userInfo']['silver']}")
     if info['userInfo']['signIn'] == "true":
-        print("今日已签到")
+        pr("今日已签到")
     else:
         qiandao(token)
 def qiandao(token): #签到
@@ -78,14 +84,14 @@ def qiandao(token): #签到
     response = requests.post(url, json=data, headers=headerd)
     response.encoding = "utf-8"
     info = json.loads(response.text)
-    print(info["signInMessage"])
+    pr(info["signInMessage"])
 def sicxs():
     config_path = 'config.py'
     if os.path.exists(config_path):
       import config  
     else:
       with open(config_path, 'w') as f: 
-        print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
+        pr("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
         f.write('#可以在此文件中添加配置变量，例如：\nsfsy = ""\n')
     try:
         env_cookie = os.environ.get("wy_frp")
@@ -97,10 +103,10 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wy_frp='' 或在 config.py 中设置 wy_frp =")
+            pr("请设置变量 export wy_frp='' 或在 config.py 中设置 wy_frp =")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export wy_frp='' 或在 config.py 中设置 wy_frp =")
+        pr("请设置变量 export wy_frp='' 或在 config.py 中设置 wy_frp =")
         sys.exit()
 
     list_cookie = re.split(r'\n|&', cookies)
@@ -109,10 +115,12 @@ def sicxs():
     for i, list_cookie_i in enumerate(list_cookie):
         try:
             print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+            pr(f"账号【{i + 1}】开始执行：")
             list = list_cookie_i.split("#")
             index(list[0], list[1])
+            send("MossFrp", ''.join(msg))
         except Exception as e:
-            print(f"账号【{i + 1}/{total_cookies}】执行出错")    
+            pr(f"账号【{i + 1}/{total_cookies}】执行出错")    
 
     print(f'\n-----------  执 行  结 束 -----------')
 

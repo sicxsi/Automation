@@ -7,6 +7,13 @@
 import requests
 import os,sys,re
 import json,re
+from notify import send
+
+def pr(message):
+    msg.append(message + "\n" )
+    print(message)
+
+msg = []
 def index(wy_user,wy_pass):#账号密码登录
 
     url = "https://ikuuu.de/auth/login"
@@ -29,7 +36,7 @@ def index(wy_user,wy_pass):#账号密码登录
     response = requests.post(url=url, headers=header, data=data)
     cookies = response.cookies
     if "1" in response.text:
-        print("登录成功")
+        pr("登录成功")
     qiandao(cookies)
 
 def  qiandao(cookies): #签到
@@ -49,18 +56,18 @@ def  qiandao(cookies): #签到
         response.encoding = "utf-8"
         info = json.loads(response.text)
         if 1 == info['ret']:
-         print(f"恭喜,{info['msg']}")
+         pr(f"恭喜,{info['msg']}")
         else:
-         print("请勿重复签到")  
+         pr("请勿重复签到")  
     except Exception as e:
-        print(e)
+        pr(e)
 def sicxs():
     config_path = 'config.py'
     if os.path.exists(config_path):
       import config  
     else:
       with open(config_path, 'w') as f: 
-        print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
+        pr("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
         f.write('#可以在此文件中添加配置变量，例如：\nsfsy = ""\n')    
     try:
         env_cookie = os.environ.get("wy_ikun")
@@ -72,10 +79,10 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wy_ikun='' 或在 config.py 中设置 wy_ikun =")
+            pr("请设置变量 export wy_ikun='' 或在 config.py 中设置 wy_ikun =")
             sys.exit()
     except Exception as e:
-        print("请设置变量 export wy_ikun='' 或在 config.py 中设置 wy_ikun =")
+        pr("请设置变量 export wy_ikun='' 或在 config.py 中设置 wy_ikun =")
         sys.exit()
 
     list_cookie = re.split(r'\n|&', cookies)
@@ -84,10 +91,12 @@ def sicxs():
     for i, list_cookie_i in enumerate(list_cookie):
         try:
             print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+            pr(f"账号【{i + 1}】开始执行：")
             list = list_cookie_i.split("#")
             index(list[0], list[1])
+            send("ikun vpn", ''.join(msg))
         except Exception as e:
-            print(f"账号【{i + 1}/{total_cookies}】执行出错")    
+            pr(f"账号【{i + 1}/{total_cookies}】执行出错")    
 
     print(f'\n-----------  执 行  结 束 -----------')
 
