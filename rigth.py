@@ -73,7 +73,7 @@ def sicxs():
         elif si_cookie:
             cookies = si_cookie
         else:
-            print("请设置变量 export wx_rigth='' 或在 config.py 中设置 wx_rigth")
+            print("#请设置变量 export wx_rigth='' 或在 config.py 中设置 wx_rigth")
             sys.exit()
     except Exception as e:
         print("请设置变量 export wx_rigth='' 或在 config.py 中设置 wx_rigth")

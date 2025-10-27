@@ -87,7 +87,7 @@ def sicxs():
     else:
       with open(config_path, 'w') as f: 
         print("首次运行，已创建配置文件 config.py，请按照说明填写相关变量后再次运行脚本。")
-        f.write('可以在此文件中添加配置变量，例如：\n sfsy = ""\n')
+        f.write('#可以在此文件中添加配置变量，例如：\n sfsy = ""\n')
     try:
         env_cookie = os.environ.get("wy_hdhome")
         si_cookie = getattr(config, 'wy_hdhome', '') 
