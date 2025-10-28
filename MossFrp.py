@@ -118,10 +118,11 @@ def sicxs():
             pr(f"账号【{i + 1}】开始执行：")
             list = list_cookie_i.split("#")
             index(list[0], list[1])
-            send("MossFrp", ''.join(msg))
         except Exception as e:
             pr(f"账号【{i + 1}/{total_cookies}】执行出错")    
-
+        finally:
+            send("MossFrp", ''.join(msg))
+            msg.clear()
     print(f'\n-----------  执 行  结 束 -----------')
 
 if __name__ == '__main__':

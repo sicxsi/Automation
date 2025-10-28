@@ -33,6 +33,9 @@ def index(cookie): #登录
          pr("登陆成功")  
          pattern = re.compile(r"discuz_uid = '(.*?)'")
          matches = pattern.findall(response.text)
+         if not matches:
+          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+          return
          uid = str(matches[0])
          sicxs_task(cookie)
          time.sleep(5)
@@ -56,8 +59,6 @@ def my(cookie,uid): #我的信息
         "cookie":cookie
     }
      
-    
-    
      response = requests.get(url=url,headers=header)
      pattern = re.compile(r'title="访问我的空间">(.*?)</a>')
      pattern2 = re.compile(r'<li><em>积分</em>(.*?)</li><li><em>威望</em>(.*?) </li>')
@@ -68,6 +69,9 @@ def my(cookie,uid): #我的信息
      matches = pattern.findall(response.text)
      matches1 = pattern2.findall(response.text)
      matches2 = pattern3.findall(response.text)
+     if not matches or not matches1 or not matches2:
+         pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+         return
 
      pr( "用户名：" + matches[0] + " 积分：" + matches1[0][0] + " 威望：" + matches1[0][1] + " 金钱：" + matches2[0])
     
@@ -130,10 +134,13 @@ def sicxs():
         pr(f"账号【{i + 1}】开始执行：")
         try:
             index(list_cookie_i)
-            send("全球主机论坛", ''.join(msg))
         except Exception as e:
             pr(f"执行账号【{i + 1}】时发生错误: {e}")
+        finally:
+          send("全球主机论坛", ''.join(msg))
+          msg.clear()
 
+               
     print(f'\n-----------  执 行  结 束 -----------')
 
 if __name__ == '__main__':

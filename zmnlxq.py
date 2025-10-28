@@ -20,6 +20,7 @@ def pr(message):
 msg = []
 
 def index(safe): #登录信息
+   try: 
     url = f"https://wxx.ball.warhorsechina.com.cn/api/getuserinfo.php?safe={safe}"
     header = headers()
     response = requests.get(url=url,headers=header)
@@ -89,6 +90,8 @@ def index(safe): #登录信息
          infos(safe)
     else:
         print("失败")  
+   except Exception as e:
+        pr(f"执行错误: {e}")
 
 def headers():#请求头
     header = {
@@ -460,14 +463,17 @@ def sicxs():
         sys.exit()
     list_cookie = re.split(r'\n|&|@', cookies)
     total_cookies = len(list_cookie)
-    for i, list_cookie_i in enumerate(list_cookie):
-        print(f'----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
-        pr(f"账号【{i + 1}】开始执行")
-        index(list_cookie_i)
+    try:
+        for i, list_cookie_i in enumerate(list_cookie):
+            print(f'----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+            pr(f"账号【{i + 1}】开始执行")
+            index(list_cookie_i)
+            checkslgift(list_cookie_i)
+    except Exception as e:
+        pr(f"账号执行出错，已跳过该账号：{e}")
+    finally:
         send("战马能量星球", ''.join(msg))
-    for i, list_cookie_i in enumerate(list_cookie):
-        print(f'----------- 账号【{i + 1}/{total_cookies}】执行领取互助饲料 -----------')
-        checkslgift(list_cookie_i)
-    print(f'-----------  执 行  结 束 -----------')
+        msg.clear()     
+
 if __name__ == '__main__':
   sicxs()

@@ -168,12 +168,15 @@ def sicxs():
     for i, list_cookie_i in enumerate(list_cookie):
         try:
             print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+            pr(f"账号【{i + 1}】开始执行：")
             list = list_cookie_i.split("#")
             authorization = logn(list[0], list[1])
             getUserInfo(authorization)
         except Exception as e:
-            pr(f"账号【{i + 1}/{total_cookies}】执行出错")    
-
+            print(f"账号【{i + 1}/{total_cookies}】执行出错{e}")    
+        finally:
+            send("科技玩家", ''.join(msg))
+            msg.clear()  
     print(f'\n-----------  执 行  结 束 -----------')
 
 if __name__ == '__main__':

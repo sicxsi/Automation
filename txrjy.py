@@ -75,6 +75,9 @@ def index(cookie): #我的信息
      matches1 = pattern1.findall(info) 
      matches2 = pattern2.findall(info) 
      matches3 = pattern3.findall(info) 
+     if not matches or not matches1 or not matches2 or not matches3:
+          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+          return
      pr(f"用户名: {matches3[0]} 积分: {matches2[0]} 经验: {matches1[0]} 家园分: {matches[0]}")
 
 
@@ -111,10 +114,11 @@ def sicxs():
             pr(f"账号【{i + 1}】开始执行：")
             list = list_cookie_i.split("#")
             get_logn(list[0], list[1])
-            send("通信人家园", ''.join(msg))
         except Exception as e:
             print(f"账号【{i + 1}/{total_cookies}】执行出错：账号密码错误，或者账号被封禁，请检查后重试！")    
-
+        finally:   
+           send("通信人家园", ''.join(msg))
+           msg.clear()  
     pr(f'\n-----------  执 行  结 束 -----------')
 
 if __name__ == '__main__':   

@@ -35,6 +35,9 @@ def index(cookie):
          pattern = re.compile(r'zqlj_sign&sign=(.*?)"')
          pr("开始签到")
          matches = pattern.findall(info)
+         if not matches:
+          pr("解析签到参数失败，可能页面结构变化或 cookie 无效")
+          return
          sgin(cookie,matches[0])
         else:
          pr("登录失败,账户可能已过期")
@@ -91,7 +94,9 @@ def my(cookie):
         matches1 = pattern2.findall(response.text)
         matches2 = pattern3.findall(response.text)
         matches3 = pattern4.findall(response.text)
-
+        if not matches or not matches1 or not matches2 or not matches3:
+          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+          return
 
         pr( "用户名：" + matches[0] + " 飞牛币：" + matches1[0] + " 登录天数：" + matches2[0] + " 金钱：" + matches3[0])
 
@@ -129,9 +134,11 @@ def sicxs():
         pr(f"账号【{i + 1}】开始执行：")
         try:
             index(list_cookie_i)
-            send("Fnnas论坛", ''.join(msg))
         except Exception as e:
             pr(f"执行账号【{i + 1}】时发生错误: {e}")
+        finally:
+            send("飞牛nas", ''.join(msg))
+            msg.clear()
 
     print(f'\n-----------  执 行  结 束 -----------')
 
