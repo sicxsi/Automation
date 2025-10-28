@@ -14,7 +14,7 @@ from notify import send
 
 def pr(message):
     msg.append(message+ "\n")
-    pr(message)
+    print(message)
 
 msg = []
 
@@ -54,12 +54,13 @@ def index(username, password):  # 登录
     if "欢迎您回来" in response.text:
         pattern = re.compile(r"'username':'(.*?)','usergroup':'(.*?)','uid':'(.*?)','gr")
         matches = pattern.findall(response.text)
-        if matches:
-            cookies = response.cookies
-            pr(f"登录成功，用户名：{matches[0][0]}")
-            time.sleep(2)
-            
-            sign(matches[0][2],cookies)
+        if not matches:
+          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+          return
+        cookies = response.cookies
+        pr(f"登录成功，用户名：{matches[0][0]}")
+        time.sleep(2)  
+        sign(matches[0][2],cookies)
     else:
         pr("登录失败，请检查账号密码是否正确")
         sys.exit()
@@ -71,6 +72,10 @@ def formhash(cookies):
         info = response.text
         pattern = re.compile(r'formhash=(.*?)&amp;')
         matches = pattern.findall(info)
+        if not matches:
+          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+          return
+
         return matches[0]
     except Exception as e:
         pr(e)
@@ -121,7 +126,9 @@ def my(uid, headers,cookies):
         matches1 = pattern1.findall(info)
         matches2 = pattern2.findall(info)
         matches3 = pattern3.findall(info)
-
+        if not matches or not matches1 or not matches2 or not matches3:
+          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+          return
         pr(f"丝瓜：{matches2[0]},经验：{matches1[0]},贡献：{matches3[0]},积分：{matches[0]}")
 
     except Exception as e:
@@ -161,10 +168,11 @@ def sicxs():
         try:
             list = list_cookie_i.split("#")
             index(list[0], list[1])
-            send("隔壁网论坛", ''.join(msg))
         except Exception as e:
             pr(f"执行账号【{i + 1}】时发生错误: {e}")
-
+        finally:
+            send("隔壁网", ''.join(msg))
+            msg.clear()
     print(f'\n----------- 执 行 结 束 -----------')
 
 

@@ -21,6 +21,7 @@ def pr(message):
 msg = []
 
 def index(sso):#登录信息
+   try: 
     current_time = time.localtime()
     current_weekday = current_time.tm_wday
     url = "https://api.xinc818.com/mini/user"
@@ -101,6 +102,9 @@ def index(sso):#登录信息
         xy_info(sso)
     else:
        print(info['msg'])  
+   except Exception as e:
+        pr(f"执行错误: {e}")
+
 def xy_qiandao(sso):#签到
     url = "https://api.xinc818.com/mini/sign/in?dailyTaskId"
     header = {
@@ -219,6 +223,7 @@ def xy_dzlist(sso):#获取点赞列表id
     response = requests.get(url=url,headers=header)
     time.sleep(3)
     response.encoding = "utf-8"
+    
     info = json.loads(response.text)
     if 0 == info['code']:
        wx_list = []
@@ -229,6 +234,7 @@ def xy_dzlist(sso):#获取点赞列表id
        return wx_list
     else:
        print(info['msg']) 
+
 def xy_id(sso):#获取想要商品id列表
     url = "https://cdn-api.xinc818.com/mini/integralGoods?orderField=sort&orderScheme=DESC&pageSize=10&pageNum=1"
     xy_uid = []
@@ -252,6 +258,7 @@ def xy_id(sso):#获取想要商品id列表
        return xy_uid
     else:
        print(info['msg']) 
+
 def xy_outerId(sso):#获取想要id
     wx_xy_id = xy_id(sso)
     outer_ids = [] 
@@ -273,6 +280,7 @@ def xy_outerId(sso):#获取想要id
          outer_id = info['data']['outerId']
          outer_ids.append(outer_id) 
     return outer_ids
+
 def xy_dj(sso):#点击想要
     url = "https://api.xinc818.com/mini/live/likeLiveItem"
     xy_ids = [] 
@@ -301,6 +309,7 @@ def xy_dj(sso):#点击想要
        except json.JSONDecodeError:
             print(f"响应解析失败: {response.text}")
     print(f"点击想要 {xy_ids}成功")
+
 def xy_follow(sso): #关注  
     url = "https://api.xinc818.com/mini/user/follow"
     xy_uid = []
@@ -383,6 +392,7 @@ def qx_follow(sso,qx_gz_id):#取消关注
         except json.JSONDecodeError:
             print(f"响应解析失败: {response.text}")
     print(f"成功取消关注用户 {qx_uid}")        
+
 def qx_pageNum(sso,qx_gz_id): #获取消关注列表
     url = f"https://api.xinc818.com/mini/personalAuthor/home/follow?type=1&userId={qx_gz_id}&pageNum=1&pageSize=20" 
     header = {
@@ -407,6 +417,7 @@ def qx_pageNum(sso,qx_gz_id): #获取消关注列表
        return wx_list
     else:
        print(info['msg']) 
+
 def xy_fatie(sso): #发帖
    timestamp = int(time.time() * 1000)
    yiyanurl = "https://api.sicxs.cn/wy/wenrou.php"
@@ -528,10 +539,11 @@ def sicxs():
         pr(f'开始执行账号【{i + 1}】')
         try:
             index(list_cookie_i)
-            send("心喜", ''.join(msg))
         except Exception as e:
             print(f"执行账号【{i + 1}】时发生错误: {e}")
-
+        finally:
+           send("心喜", ''.join(msg))
+           msg.clear()  
     print(f'\n-----------  执 行  结 束 -----------')
 if __name__ == '__main__':
   sicxs()

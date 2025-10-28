@@ -19,7 +19,7 @@ from notify import send
 # sign为固定值 
 def pr(message):
     msg.append(message + "\n" )
-    pr(message)
+    print(message)
 
 msg = []
 def index(wx_auth,wx_username): #登录信息
@@ -124,10 +124,11 @@ def sicxs():
             pr(f"账号【{i + 1}】开始执行：")
             list = list_cookie_i.split("#")
             index(list[0], list[1])
-            send("回收猿回收", ''.join(msg))
         except Exception as e:
-            pr(f"账号【{i + 1}/{total_cookies}】执行出错")    
-
+            pr(f"账号【{i + 1}/{total_cookies}】执行出错: {e}")    
+        finally:
+            send("回收猿回收", ''.join(msg))
+            msg.clear() 
     print(f'\n-----------  执 行  结 束 -----------')
 
 

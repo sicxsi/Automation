@@ -62,6 +62,9 @@ def sing(cookie):#验证是否签到
          
          pattern = re.compile(r'var sign = "(.*?)"')
          matches = pattern.findall(info)
+         if not matches:
+          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+          return
          sgin = matches[0]
          sing1(cookie,sgin)
          time.sleep(3)
@@ -116,7 +119,9 @@ def my(cookie):#查询信息
          pattern2 = re.compile(r'金币：</span><b class="text-danger">(.*?)</b>')
          matches = pattern.findall(info)
          matches1 = pattern2.findall(info)
-
+         if not matches or not matches1:
+          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+          return    
          pr( "用户名：" + matches[0] + " 金币" + matches1[0])
        else:
          pr("获取错误。") 
@@ -157,10 +162,11 @@ def sicxs():
         pr(f"账号【{i + 1}】开始执行：")
         try:
             index(list_cookie_i)
-            send("hifiti论坛", ''.join(msg))
         except Exception as e:
             pr(f"执行账号【{i + 1}】时发生错误: {e}")
-
+        finally:
+            send("音乐磁场", ''.join(msg))
+            msg.clear()
     print(f'\n-----------  执 行  结 束 -----------')
 
 if __name__ == '__main__':

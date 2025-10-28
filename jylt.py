@@ -131,11 +131,14 @@ def sicxs():
     
     for i, list_cookie_i in enumerate(list_cookie):
         print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
+        pr(f"账号【{i + 1}】开始执行：")
         try:
             index(list_cookie_i)
         except Exception as e:
             pr(f"执行账号【{i + 1}】时发生错误: {e}")
-
+        finally:
+          send("精益论坛", ''.join(msg))
+          msg.clear()
     print(f'\n-----------  执 行  结 束 -----------')
 
 

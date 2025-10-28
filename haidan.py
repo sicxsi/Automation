@@ -93,6 +93,10 @@ def torrents(cookie):
          matches2 = pattern3.findall(info)
          matches3 = pattern4.findall(info)
          matches4 = pattern5.findall(info)
+
+         if not matches or not matches1 or not matches2 or not matches3 or not matches4:
+          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+          return
          pr( "用户名：" + matches[0] + " 魔力值：" + matches2[0][1] + " 分享率" + matches1[0] +  " 上传量" + matches3[0] + " 下载量" + matches4[0])
        else:
          pr("查询失败")
@@ -130,10 +134,11 @@ def sicxs():
         pr(f"账号【{i + 1}】开始执行：")
         try:
             index(list_cookie_i)
-            send("海胆PT站", ''.join(msg))
         except Exception as e:
             pr(f"执行账号【{i + 1}】时发生错误: {e}")
-
+        finally:
+            send("海胆PT站", ''.join(msg))
+            msg.clear()  
     print(f'\n-----------  执 行  结 束 -----------')
 
 
