@@ -30,11 +30,15 @@ def index(cookie):
      try:
         response = requests.get(url=url,headers=header)
         info = response.text
-        if "首页" in info:
-         pr("登陆成功")
-         attendance(cookie)  
+        if "签到" in info:
+         pr("账号登陆成功")
+         if "签到已得" in info:
+            pr("您今天已经签到过了，请勿重复刷新。")
+            torrents(cookie)
+         else:   
+          attendance(cookie)  
         else:
-         pr("登录失败")
+         pr("登录失败,请检查cookie是否有效")
      except Exception as e:
           pr(e)
 def attendance(cookie):
@@ -52,21 +56,12 @@ def attendance(cookie):
      try:
         response = requests.get(url=url,headers=header)
         info = response.text
-        if "签到成功" in info:
-           
-           pr("签到成功")
-
-           torrents(cookie)
-
-        elif "您今天已经签到过了" in info:
-         
-         pr("您今天已经签到过了，请勿重复刷新。")
-        
-
+        if "签到已得" in info:
+         pr("签到成功，请勿重复刷新。")
          torrents(cookie)
-
         else :
-         pr("签到失败")
+          pr("签到中...")
+          attendance(cookie)
           
      except Exception as e:
           pr(e)
@@ -84,7 +79,8 @@ def torrents(cookie):
     }
      try:
        response = requests.get(url=url,headers=header)
-       pattern = re.compile(r"class='CrazyUser_Name'><b>(.+?)</b>")
+
+       pattern = re.compile(r"'><b>(.*?)</b></a></span>")
        pattern2 = re.compile(r'>使用</a>]: (.*)                 <a')
        pattern3 = re.compile(r'签到已得(.*?)\]</a>')
     

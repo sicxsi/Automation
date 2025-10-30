@@ -18,25 +18,8 @@ def pr(message):
 
 msg = []
 
-def index(username, password):  # 登录
-    url = "https://gebi1.com/member.php"
-
-    params = {
-        'mod': "logging",
-        'action': "login",
-        'loginsubmit': "yes",
-        'handlekey': "login",
-        'loginhash': "LGugm",
-        'inajax': "1"
-    }
-
-    payload = {
-        'referer': "https://gebi1.com/portal.php",
-        'username': username,
-        'password': password,
-        'questionid': "0",
-        'answer': ""
-    }
+def index(cookie):  # 登录
+    url = "https://www.gebi1.cn/forum.php"
 
     headers = {
         'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0",
@@ -47,78 +30,79 @@ def index(username, password):  # 登录
         'referer': "https://gebi1.com/portal.php",
         'accept-language': "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
         'priority': "u=0, i",
+        'cookie': cookie,
     }
 
     # 登录请求
-    response = requests.post(url, params=params, data=payload, headers=headers)
-    if "欢迎您回来" in response.text:
-        pattern = re.compile(r"'username':'(.*?)','usergroup':'(.*?)','uid':'(.*?)','gr")
+    response = requests.get(url,headers=headers)
+    if "登录后即可体验更多功能" in response.text:
+        pr("cookie失效或错误")
+    else:
+        pattern = re.compile(r"discuz_uid = '(.*?)',")
+        pattern1 = re.compile(r'访问我的空间" class="kmname">(.*?)</a>')
+        pattern2 = re.compile(r'formhash=(.*?)&amp;')
         matches = pattern.findall(response.text)
-        if not matches:
+        matches1 = pattern1.findall(response.text)
+        matches2 = pattern2.findall(response.text) 
+        if not matches or not matches1 or not matches2:
           pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
           return
-        cookies = response.cookies
-        pr(f"登录成功，用户名：{matches[0][0]}")
+        pr(f"登录成功，用户名：{matches1[0]}")
         time.sleep(2)  
-        sign(matches[0][2],cookies)
-    else:
-        pr("登录失败，请检查账号密码是否正确")
+        uid = matches[0]
+        formhash = matches2[0]
+        sign(uid,cookie,formhash)
         sys.exit()
 
-def formhash(cookies):
-    url = "https://www.gebi1.cn/forum.php"
-    try:
-        response = requests.get(url, cookies=cookies)
-        info = response.text
-        pattern = re.compile(r'formhash=(.*?)&amp;')
-        matches = pattern.findall(info)
-        if not matches:
-          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
-          return
-
-        return matches[0]
-    except Exception as e:
-        pr(e)
-def sign(uid,cookies):
-
-    url = "https://www.gebi1.cn/plugin.php"
-    formhash1 = formhash(cookies)
-    params ={
-        "id": "k_misign:sign",
-        "operation": "qiandao",
-        "format": "button",
-        "formhash": f"{formhash1}",
-        "inajax": "1",
-        "ajaxtarget": "midaben_sign"
-        }
+def sign(uid,cookie,formhash):
+    url = f"https://www.gebi1.cn/plugin.php?id=k_misign:sign&operation=qiandao&format=button&formhash={formhash}&inajax=1&ajaxtarget=midaben_sign"
     headers = {
         'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0",
-        'referer': "https://www.gebi1.cn/forum.php",
+        'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        'Accept-Encoding': "gzip, deflate, br, zstd",
+        'cache-control': "max-age=0",
+        'origin': "https://gebi1.com",
+        'referer': "https://gebi1.com/portal.php",
+        'accept-language': "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
         'priority': "u=0, i",
+        'cookie': cookie,
     }
 
-   
     try:
-        response = requests.get(url, params=params,headers=headers,cookies=cookies)
+        response = requests.get(url,headers=headers)
         info = response.text
-        if "今日已签" in info:
+        if "签到成功" in info:
             pr("签到成功")
             time.sleep(5)
-            my(uid, headers)
-        else:
-            pr("签到失败")
+            my(uid, cookie)
+        elif "今日已签" in info:
+            pr("今日已签到过了")
+            my(uid,cookie)
+        elif "登录后" in info:
+            pr("cookie失效或错误")    
     except Exception as e:
         pr(e)
 
 
-def my(uid, headers,cookies):
+def my(uid,cookie):
     url = f"https://gebi1.com/home.php?mod=space&uid={uid}&do=profile&from=space"
+    headers = {
+        'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36 Edg/137.0.0.0",
+        'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+        'Accept-Encoding': "gzip, deflate, br, zstd",
+        'cache-control': "max-age=0",
+        'origin': "https://gebi1.com",
+        'referer': "https://gebi1.com/portal.php",
+        'accept-language': "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
+        'priority': "u=0, i",
+        'cookie': cookie,
+    }
     try:
         
-        response = requests.get(url, headers=headers,cookies=cookies)
+        response = requests.get(url, headers=headers)
         info = response.text
         pattern = re.compile(r'<span>(.*?)</span>积分</a>')
-        pattern1 = re.compile(r'<span>(.*?)</span>经验值</a>')
+        pattern1 = re.compile(r'kmicon1"><span>(.*?)</span>经验值</a>')
         pattern2 = re.compile(r'<span>(.*?)</span>丝瓜</a>')
         pattern3 = re.compile(r'<span>(.*?)</span>贡献</a>')
 
@@ -166,8 +150,7 @@ def sicxs():
         print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
         pr(f"账号【{i + 1}】开始执行：")
         try:
-            list = list_cookie_i.split("#")
-            index(list[0], list[1])
+            index(list_cookie_i)
         except Exception as e:
             pr(f"执行账号【{i + 1}】时发生错误: {e}")
         finally:

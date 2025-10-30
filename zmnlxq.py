@@ -463,17 +463,17 @@ def sicxs():
         sys.exit()
     list_cookie = re.split(r'\n|&|@', cookies)
     total_cookies = len(list_cookie)
-    try:
-        for i, list_cookie_i in enumerate(list_cookie):
+    for i, list_cookie_i in enumerate(list_cookie):
+        try:
             print(f'----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
             pr(f"账号【{i + 1}】开始执行")
             index(list_cookie_i)
             checkslgift(list_cookie_i)
-    except Exception as e:
-        pr(f"账号执行出错，已跳过该账号：{e}")
-    finally:
-        send("战马能量星球", ''.join(msg))
-        msg.clear()     
-
+        except Exception as e:
+            pr(f"账号执行出错，已跳过该账号：{e}")
+        finally:
+            send("战马能量星球", ''.join(msg))
+            msg.clear()     
+    print(f'\n-----------  执 行  结 束 -----------')
 if __name__ == '__main__':
   sicxs()
