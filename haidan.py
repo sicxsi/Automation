@@ -31,10 +31,15 @@ def index(cookie):
         response = requests.get(url=url,headers=header)
         time.sleep(3)
         info = response.text
-        if "首页" in info:
-         pr("登陆成功")
-        
-         signin(cookie)  
+        if "打卡" in info:
+         pr("账号登陆成功")
+
+         if "已经打卡" in info:
+           pr("您今天已经打卡过了，请勿重复打卡。")
+
+           torrents(cookie)
+         else:
+          signin(cookie)
         else:
          pr("登录失败,等待10秒后重试")
          time.sleep(10)
@@ -55,7 +60,7 @@ def signin(cookie):
         response = requests.get(url=url,headers=header)
         time.sleep(3)
         if response.status_code == 200:
-           
+           pr("打卡成功,请勿重复打卡。")
            torrents(cookie)
         else:
            pr("打卡失败？")  
@@ -76,30 +81,26 @@ def torrents(cookie):
         "cookie":cookie
     }
      try:
-       response = requests.get(url=url,headers=header)
-       info = response.text
-       time.sleep(3)
-       if "已经打卡" in info:
-         
-         pattern = re.compile(r"class='VeteranUser_Name'><b>(.+?)</b>")
-         pattern2 = re.compile(r'分享率:             </font> (.*?)        ')
-         pattern3 = re.compile(r'<span id="(.*)">(.*?)</span>')
-         pattern4 = re.compile(r'上传量:             </font> (.*?)        ')
-         pattern5 = re.compile(r'下载量:             </font> (.*?)        ')
+        response = requests.get(url=url,headers=header)
+        info = response.text
+        time.sleep(3)
+        pattern = re.compile(r"class='VeteranUser_Name'><b>(.+?)</b>")
+        pattern2 = re.compile(r'分享率:             </font> (.*?)        ')
+        pattern3 = re.compile(r'<span id="(.*)">(.*?)</span>')
+        pattern4 = re.compile(r'上传量:             </font> (.*?)        ')
+        pattern5 = re.compile(r'下载量:             </font> (.*?)        ')
     
 
-         matches = pattern.findall(info)
-         matches1 = pattern2.findall(info)
-         matches2 = pattern3.findall(info)
-         matches3 = pattern4.findall(info)
-         matches4 = pattern5.findall(info)
+        matches = pattern.findall(info)
+        matches1 = pattern2.findall(info)
+        matches2 = pattern3.findall(info)
+        matches3 = pattern4.findall(info)
+        matches4 = pattern5.findall(info)
 
-         if not matches or not matches1 or not matches2 or not matches3 or not matches4:
+        if not matches or not matches1 or not matches2 or not matches3 or not matches4:
           pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
           return
-         pr( "用户名：" + matches[0] + " 魔力值：" + matches2[0][1] + " 分享率" + matches1[0] +  " 上传量" + matches3[0] + " 下载量" + matches4[0])
-       else:
-         pr("查询失败")
+        pr( "用户名：" + matches[0] + " 魔力值：" + matches2[0][1] + " 分享率" + matches1[0] +  " 上传量" + matches3[0] + " 下载量" + matches4[0])
      except Exception as e:
          pr("登陆失败")
 

@@ -16,7 +16,7 @@ def pr(message):
 
 msg = []
 def index(cookie): #验证登录
-     url = 'https://www.hifiti.com/index.htm'
+     url = 'https://www.hifiti.com/my.htm'
      header = {
         "authority":"www.hifiti.com",
         "method":"GET",
@@ -30,11 +30,12 @@ def index(cookie): #验证登录
      try:
         response = requests.get(url=url,headers=header)
         info = response.text
-        if "首页" in info:
-         pr("登陆成功")
-         sing(cookie)  
+        if "用户登录" in info:
+         pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+   
         else:
-         pr("登录失败")
+         pr("登录成功")
+         sing(cookie)  
      except Exception as e:
           pr(e)
 def sing(cookie):#验证是否签到
@@ -59,14 +60,8 @@ def sing(cookie):#验证是否签到
            pr("您今天已经签到过了，请勿重复签到。")
            my(cookie)
         elif "签到" in info:
-         
-         pattern = re.compile(r'var sign = "(.*?)"')
-         matches = pattern.findall(info)
-         if not matches:
-          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
-          return
-         sgin = matches[0]
-         sing1(cookie,sgin)
+        
+         sing1(cookie)
          time.sleep(3)
          my(cookie)
 
@@ -75,7 +70,7 @@ def sing(cookie):#验证是否签到
 
      except Exception as e:
           pr(e)
-def sing1(cookie,sgin):#签到
+def sing1(cookie):#签到
      url = 'https://www.hifiti.com/sg_sign.htm'
      header = {
         "authority":"www.hifiti.com",
@@ -86,11 +81,8 @@ def sing1(cookie,sgin):#签到
         "referer":"https://www.hifiti.com/sg_sign.htm",
         "cookie":cookie
     }
-     data = {
-        "sign":sgin,
-     }
      try:
-       response = requests.post(url=url,headers=header,data=data)
+       response = requests.post(url=url,headers=header)
        s1 = response.status_code 
        if s1 == 200 :
           pr("签到成功")
@@ -114,17 +106,18 @@ def my(cookie):#查询信息
        response = requests.get(url=url,headers=header)
        info = response.text
        if "基本资料" in info:
-         
          pattern = re.compile(r'"view/img/avatar.png"> (.*?)</a></li>')
          pattern2 = re.compile(r'金币：</span><b class="text-danger">(.*?)</b>')
          matches = pattern.findall(info)
          matches1 = pattern2.findall(info)
+
          if not matches or not matches1:
           pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
           return    
+         
          pr( "用户名：" + matches[0] + " 金币" + matches1[0])
        else:
-         pr("获取错误。") 
+         pr("解析用户信息失败，可能页面结构变化或 cookie 无效") 
 
     except Exception as e:
          pr(e)

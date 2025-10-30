@@ -119,7 +119,7 @@ def sicxs():
         finally:   
            send("通信人家园", ''.join(msg))
            msg.clear()  
-    pr(f'\n-----------  执 行  结 束 -----------')
+    print(f'\n-----------  执 行  结 束 -----------')
 
 if __name__ == '__main__':   
    sicxs() 

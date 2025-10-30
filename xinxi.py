@@ -101,9 +101,9 @@ def index(sso):#登录信息
          time.sleep(3)
         xy_info(sso)
     else:
-       print(info['msg'])  
+       print("账号封禁或已失效")  
    except Exception as e:
-        pr(f"执行错误: {e}")
+        pr("账号封禁或已失效")
 
 def xy_qiandao(sso):#签到
     url = "https://api.xinc818.com/mini/sign/in?dailyTaskId"

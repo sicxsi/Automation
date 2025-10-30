@@ -30,10 +30,13 @@ def index(cookie):
         response = s.get(url=url,headers=header)
         time.sleep(3)
         info = response.text
-        if "首页" in info:
-         pr("登陆成功")
-        
-         attendance(cookie)  
+        if "签到" in info:
+         pr("账号登陆成功")
+         if "签到已得" in info:
+            pr("您今天已经签到过了，请勿重复刷新。")
+            torrents(cookie)
+         else:
+            attendance(cookie)
         else:
          pr("登录失败")
      except Exception as e:

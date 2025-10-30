@@ -16,9 +16,9 @@ def pr(message):
 
 msg = []
 def index(cookie): #登录
-    url = "https://bbs.125.la/plugin.php?id=dsu_paulsign:sign"
+    url = "https://bbs.ijingyi.com"
     header = {
-        "authority": "bbs.125.la",
+        "authority": "bbs.ijingyi.com",
         "method": "GET",
         "path": "/",
         "scheme": "https",
@@ -34,15 +34,18 @@ def index(cookie): #登录
     response = requests.get(url=url,headers=header)
     response.encoding = "utf-8"
     info = response.text
-    if "你需要登录" in info:
-        pr("cookie失效")
+    if "<em>登录</em></button></td>" in info:
+        pr("cookie失效或错误")
     else:
-        pr("登陆成功")  
+        pr("账号登陆成功")  
         time.sleep(3)
         pattern = re.compile(r'uid=(.*?)" target="_blank" title="访问我的空间">(.*?)</a>')
         pattern1 = re.compile(r'formhash=(.*?)">退出</a>')
         matches = pattern.findall(info) 
         matches1 = pattern1.findall(info)
+        if not matches or not matches1 :
+          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+          return
         pr(f"用户名: {matches[0][1]}")
         hash = matches1[0]
         id = matches[0][0]
@@ -51,9 +54,9 @@ def index(cookie): #登录
         infoo(cookie,id)
 
 def infoo(cookie,id):#我的信息
-    url = f"https://bbs.125.la/home.php?mod=space&uid={id}&do=profile&from=space"
+    url = f"https://bbs.ijingyi.com/home.php?mod=space&uid={id}&do=profile&from=space"
     header = {
-        "authority": "bbs.125.la",
+        "authority": "bbs.ijingyi.com",
         "method": "GET",
         "path": f"/home.php?mod=space&uid={id}&do=profile&from=space",
         "scheme": "https",
@@ -78,13 +81,15 @@ def infoo(cookie,id):#我的信息
     matches1 = pattern1.findall(info) 
     matches2 = pattern2.findall(info) 
     matches3 = pattern3.findall(info) 
-
+    if not matches or not matches1 or not matches2 or not matches3:
+          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+          return
     pr(f"积分: {matches[0]} 精币: {matches1[0]} 荣誉: {matches2[0]} 签到累计天数: {matches3[0][0]} 本月签到天数: {matches3[0][2]} 连续签到天数: {matches3[0][1]} ")
 
 def qiandao(cookie,hash):#签到
-    url = f"https://bbs.125.la/plugin.php?id=dsu_paulsign:sign&operation=qiandao&infloat=1"
+    url = f"https://bbs.ijingyi.com/plugin.php?id=dsu_paulsign:sign&operation=qiandao&infloat=1"
     header = {
-        "authority": "bbs.125.la",
+        "authority": "bbs.ijingyi.com",
         "method": "POST",
         "path": f"/plugin.php?id=dsu_paulsign:sign&operation=qiandao&infloat=1",
         "scheme": "https",
@@ -100,8 +105,12 @@ def qiandao(cookie,hash):#签到
     data = {'formhash':hash,"submit": "1","targerurl": "","todaysay": "","qdxq": "kx"}
     response = requests.post(url=url,headers=header,data=data)
     response.encoding = "utf-8"
-    info = json.loads(response.text)    
-    pr("签到成功")
+    if "您今日已经签到" in response.text:
+        pr("您今日已经签到过了")
+    elif "签到成功" in response.text:
+       pr("签到成功")
+    else:
+        pr(response.text)
 
 def sicxs():
     config_path = 'config.py'
