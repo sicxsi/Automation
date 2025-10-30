@@ -75,7 +75,6 @@ def task_liulan(uid,skey):#浏览任务
      response.encoding = "utf-8"
      info = json.loads(response.text)
      if 200 == info['code']:
-         pr(info)
          task_wc(uid,skey,i)
          task_lq(uid,skey,i)
      else:
@@ -169,3 +168,4 @@ def sicxs():
 
 if __name__ == '__main__':
  sicxs()
+
