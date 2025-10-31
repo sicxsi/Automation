@@ -109,7 +109,7 @@ def sicxs():
         pr("请设置变量 export app_hlx='' 或在 config.py 中设置 app_hlx =")
         sys.exit()
 
-    list_cookie = re.split(r'\n|&', cookies)
+    list_cookie = [c for c in re.split(r'\n|&', cookies) if c.strip()]
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):

@@ -1,7 +1,7 @@
 # name: 精益论坛
 # Author: sicxs
 # Date: 2024-11-25
-# export wy_jylt="cookie" &,@换行分割
+# export wy_jylt="cookie" &,换行分割
 # cron: 20 8 * * *
 # new Env('精益论坛');
 
@@ -16,22 +16,30 @@ def pr(message):
 
 msg = []
 def index(cookie): #登录
-    url = "https://bbs.ijingyi.com"
-    header = {
-        "authority": "bbs.ijingyi.com",
-        "method": "GET",
-        "path": "/",
-        "scheme": "https",
-        "cache-control": "max-age=0",
-        "sec-ch-ua": "\"Microsoft Edge\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "\"Windows\"",
-        "upgrade-insecure-requests": "1",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        "cookie": cookie,
-        }
-    response = requests.get(url=url,headers=header)
+    url = "https://bbs.ijingyi.com/plugin.php"
+
+    params = {
+    'id': "dsu_paulsign:sign"
+    }
+
+    headers = {
+    'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36 Edg/141.0.0.0",
+    'Accept': "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+    'cache-control': "max-age=0",
+    'sec-ch-ua': "\"Microsoft Edge\";v=\"141\", \"Not?A_Brand\";v=\"8\", \"Chromium\";v=\"141\"",
+    'sec-ch-ua-mobile': "?0",
+    'sec-ch-ua-platform': "\"Windows\"",
+    'upgrade-insecure-requests': "1",
+    'sec-fetch-site': "none",
+    'sec-fetch-mode': "navigate",
+    'sec-fetch-user': "?1",
+    'sec-fetch-dest': "document",
+    'accept-language': "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6",
+    'priority': "u=0, i",
+    'Cookie': cookie,
+    }
+
+    response = requests.get(url=url,headers=headers,params=params)
     response.encoding = "utf-8"
     info = response.text
     if "<em>登录</em></button></td>" in info:
@@ -39,6 +47,20 @@ def index(cookie): #登录
     else:
         pr("账号登陆成功")  
         time.sleep(3)
+        if "您今日已经签到" in info:
+            url = "https://bbs.ijingyi.com/plugin.php"
+            response = requests.get(url=url,headers=headers)
+            response.encoding = "utf-8"
+            info = response.text
+            pattern = re.compile(r'uid=(.*?)" target="_blank" title="访问我的空间">(.*?)</a>')
+            matches = pattern.findall(info) 
+            if not matches :
+               pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+               return
+            id = matches[0][0]
+            pr("今日已完成签到,无需重复签到")
+            infoo(id,headers)
+            return
         pattern = re.compile(r'uid=(.*?)" target="_blank" title="访问我的空间">(.*?)</a>')
         pattern1 = re.compile(r'formhash=(.*?)">退出</a>')
         matches = pattern.findall(info) 
@@ -49,28 +71,13 @@ def index(cookie): #登录
         pr(f"用户名: {matches[0][1]}")
         hash = matches1[0]
         id = matches[0][0]
-        qiandao(cookie,hash)
+        qiandao(hash,headers)
         time.sleep(3)
-        infoo(cookie,id)
+        infoo(id,headers)
 
-def infoo(cookie,id):#我的信息
+def infoo(id,headers):#我的信息
     url = f"https://bbs.ijingyi.com/home.php?mod=space&uid={id}&do=profile&from=space"
-    header = {
-        "authority": "bbs.ijingyi.com",
-        "method": "GET",
-        "path": f"/home.php?mod=space&uid={id}&do=profile&from=space",
-        "scheme": "https",
-        "cache-control": "max-age=0",
-        "sec-ch-ua": "\"Microsoft Edge\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "\"Windows\"",
-        "upgrade-insecure-requests": "1",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        "cookie": cookie,
-        }
-    
-    response = requests.get(url=url,headers=header)
+    response = requests.get(url=url,headers=headers)
     response.encoding = "utf-8"
     info = response.text
     pattern = re.compile(r'<li><em>积分</em>(.*?)</li>')
@@ -86,31 +93,18 @@ def infoo(cookie,id):#我的信息
           return
     pr(f"积分: {matches[0]} 精币: {matches1[0]} 荣誉: {matches2[0]} 签到累计天数: {matches3[0][0]} 本月签到天数: {matches3[0][2]} 连续签到天数: {matches3[0][1]} ")
 
-def qiandao(cookie,hash):#签到
+def qiandao(hash,headers):#签到
     url = f"https://bbs.ijingyi.com/plugin.php?id=dsu_paulsign:sign&operation=qiandao&infloat=1"
-    header = {
-        "authority": "bbs.ijingyi.com",
-        "method": "POST",
-        "path": f"/plugin.php?id=dsu_paulsign:sign&operation=qiandao&infloat=1",
-        "scheme": "https",
-        "cache-control": "max-age=0",
-        "sec-ch-ua": "\"Microsoft Edge\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "\"Windows\"",
-        "upgrade-insecure-requests": "1",
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36 Edg/131.0.0.0",
-        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-        "cookie": cookie,
-        }
     data = {'formhash':hash,"submit": "1","targerurl": "","todaysay": "","qdxq": "kx"}
-    response = requests.post(url=url,headers=header,data=data)
+    response = requests.post(url=url,headers=headers,data=data)
     response.encoding = "utf-8"
-    if "您今日已经签到" in response.text:
-        pr("您今日已经签到过了")
-    elif "签到成功" in response.text:
-       pr("签到成功")
+    info = json.loads(response.text)
+    if 1 == info['status']:
+        pr(f"签到成功,连续签到 {info['credit']} 天")
+    elif 0 == info['status']:
+        pr("今日已签到")    
     else:
-        pr(response.text)
+        pr(f"签到失败,{info}")    
 
 def sicxs():
     config_path = 'config.py'
@@ -135,9 +129,8 @@ def sicxs():
     except Exception as e:
         pr("请设置变量 export wy_jylt='' 或在 config.py 中设置 wy_jylt")
         sys.exit()
-    list_cookie = re.split(r'\n|&|@', cookies)
+    list_cookie = [c for c in re.split(r'\n|&', cookies) if c.strip()]
     total_cookies = len(list_cookie)
-    
     for i, list_cookie_i in enumerate(list_cookie):
         print(f'\n----------- 账号【{i + 1}/{total_cookies}】执行 -----------')
         pr(f"账号【{i + 1}】开始执行：")

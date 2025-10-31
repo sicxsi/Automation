@@ -4,7 +4,7 @@
 # 微信小程序
 # export wx_xx="sso" 
 # 抓小程序 -> 我的 sso值  抓到后最好不要进小程序
-# 多号 @,&分割 
+# 多号 换行,&分割 
 # 加入星期判断 到时间运行任务，防止封号
 # 可以自己更改发帖和评论接口。
 # cron: 16 8 * * *
@@ -531,7 +531,7 @@ def sicxs():
     except Exception as e:
         pr("请设置变量 export wx_xx='' 或在 config.py 中设置 wx_xx")
         sys.exit()
-    list_cookie = re.split(r'\n|&|@', cookies)
+    list_cookie = [c for c in re.split(r'\n|&', cookies) if c.strip()]
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):

@@ -5,7 +5,7 @@
 # 微信小程序
 # export wx_hsyhs="auth#username" 
 # 抓小程序 -> 我的 auth和username值
-# 多号 @,&分割 
+# 多号 换行,&分割 
 # cron: 16 8 * * *
 # new Env('回收猿回收');
 import requests
@@ -115,7 +115,7 @@ def sicxs():
         pr("请设置变量 export wx_hsyhs='' 或在 config.py 中设置 wx_hsyhs =")
         sys.exit()
 
-    list_cookie = re.split(r'\n|&|@', cookies)
+    list_cookie = [c for c in re.split(r'\n|&', cookies) if c.strip()]
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):

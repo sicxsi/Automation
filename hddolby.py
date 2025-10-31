@@ -2,7 +2,7 @@
 # name: 杜比
 # Author: sicxs
 # Date: 2024-11-04
-# export wy_hddolby="cookie" &,@分割
+# export wy_hddolby="cookie" &,换行分割
 # 请不要异地签到，最起码在本地先登陆下
 # cron: 10 8 * * *
 # new Env('杜比');
@@ -121,7 +121,7 @@ def sicxs():
     except Exception as e:
         print("请设置变量 export wy_hddolby='' 或在 config.py 中设置 wy_hddolby")
         sys.exit()
-    list_cookie = re.split(r'\n|&|@', cookies)
+    list_cookie = [c for c in re.split(r'\n|&', cookies) if c.strip()]
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):
