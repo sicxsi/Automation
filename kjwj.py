@@ -1,7 +1,7 @@
 # name: 科技玩家
 # Author: sicxs
 # Date: 2024-11-4
-# export wy_kjwj="账号#密码"&分割 
+# export wy_kjwj="账号#密码" 换行，&分割 
 # cron: 15 8 * * *
 # new Env('科技玩家');
 import requests
@@ -162,7 +162,7 @@ def sicxs():
         pr("请设置变量 export wy_kjwj='' 或在 config.py 中设置 wy_kjwj =")
         sys.exit()
 
-    list_cookie = re.split(r'\n|&', cookies)
+    list_cookie = [c for c in re.split(r'\n|&', cookies) if c.strip()]
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):

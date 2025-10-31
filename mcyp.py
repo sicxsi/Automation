@@ -2,7 +2,7 @@
 # Author: sicxs
 # Date: 2024-11-25 # 2025-06-11
 # export wx_mcyp="uid#skey" 
-# &,@换行分割 
+# &,换行分割 
 # 功能:签到，浏览任务
 # 账号mini币只有90天有效期,过期自动失效
 # cron: 20 8 * * *
@@ -75,6 +75,7 @@ def task_liulan(uid,skey):#浏览任务
      response.encoding = "utf-8"
      info = json.loads(response.text)
      if 200 == info['code']:
+
          task_wc(uid,skey,i)
          task_lq(uid,skey,i)
      else:
@@ -150,7 +151,7 @@ def sicxs():
         pr("请设置变量 export wx_mcyp='' 或在 config.py 中设置 wx_mcyp =")
         sys.exit()
 
-    list_cookie = re.split(r'\n|&|@', cookies)
+    list_cookie = [c for c in re.split(r'\n|&', cookies) if c.strip()]
     total_cookies = len(list_cookie)
     for i, list_cookie_i in enumerate(list_cookie):
         try:
@@ -168,4 +169,3 @@ def sicxs():
 
 if __name__ == '__main__':
  sicxs()
-

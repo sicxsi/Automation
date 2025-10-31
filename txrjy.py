@@ -1,7 +1,7 @@
 # name: 通信人家园
 # Author: sicxs
 # Date: 2024-11-25
-# export wy_txrjy="账号#密码" &,@换行分割 
+# export wy_txrjy="账号#密码" &,换行分割 
 # cron: 20 8 * * *
 # new Env('通信人家园');
 
@@ -105,7 +105,7 @@ def sicxs():
         pr("请设置变量 export wy_txrjy='' 或在 config.py 中设置 wy_txrjy =")
         sys.exit()
 
-    list_cookie = re.split(r'\n|&', cookies)
+    list_cookie = [c for c in re.split(r'\n|&', cookies) if c.strip()]
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):

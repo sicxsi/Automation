@@ -2,7 +2,7 @@
 # name: 音乐磁场
 # Author: sicxs
 # Date: 2024-11-2
-# export wy_hifiti="cookie"  @,&分割
+# export wy_hifiti="cookie"  换行,&分割
 # cron: 11 8 * * *
 # new Env('音乐磁场');
 import requests
@@ -147,7 +147,7 @@ def sicxs():
     except Exception as e:
         pr("请设置变量 export wy_hifiti='' 或在 config.py 中设置 wy_hifiti")
         sys.exit()
-    list_cookie = re.split(r'\n|&|@', cookies)
+    list_cookie = [c for c in re.split(r'\n|&', cookies) if c.strip()]
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):
