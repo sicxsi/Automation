@@ -1,7 +1,7 @@
 # name: 汤星球会员中心
 # Author: sicxs
-# Date: 2025-10-30
-# export wx_txq="authorization"  @,&分割
+# Date: 2024-11-21
+# export wx_txq="authorization"  换行,&分割
 # cron: 11 8 * * *
 # new Env('汤星球会员中心');
 
@@ -89,7 +89,7 @@ def sicxs():
     except Exception as e:
         pr("请设置变量 export wx_txq='' 或在 config.py 中设置 wx_txq")
         sys.exit()
-    list_cookie = re.split(r'\n|&|@', cookies)
+    list_cookie = [c for c in re.split(r'\n|&', cookies) if c.strip()]
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):
