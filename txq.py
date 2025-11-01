@@ -52,8 +52,9 @@ def qiandao(headers,activityId):
     response.encoding = "utf-8"
     info = json.loads(response.text)
     try:
-      if "data" in info and 'data' in info['data']:
-         if info['data']['rspCode'] == 00:
+
+      if info['success']:
+         if info['data']['rspCode'] == "00":
             pr(f"签到成功：\n已经签到{info['data']['result']['accumulateDay']}天，本次签到获得：{info['data']['result']['dailyPointReward']}积分")
          elif info['data']['rspCode'] == "SIGN_TODAY_ALREADY_DONE":
             pr("今日已完成签到")
@@ -88,7 +89,7 @@ def sicxs():
     except Exception as e:
         pr("请设置变量 export wx_txq='' 或在 config.py 中设置 wx_txq")
         sys.exit()
-    list_cookie = [c for c in re.split(r'\n|&|@', cookies) if c.strip()]
+    list_cookie = [c for c in re.split(r'\n|&', cookies) if c.strip()]
     total_cookies = len(list_cookie)
     
     for i, list_cookie_i in enumerate(list_cookie):
