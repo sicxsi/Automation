@@ -31,7 +31,7 @@ def index(cookie):
      try:
         response = requests.get(url=url,headers=header)
         info = response.text
-        if "补签" in info: 
+        if "我的打卡动态" in info: 
          pattern = re.compile(r'zqlj_sign&sign=(.*?)"')
          pr("开始签到")
          matches = pattern.findall(info)
