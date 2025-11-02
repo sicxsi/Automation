@@ -71,7 +71,7 @@ def index(cookie): #登录
         pr(f"用户名: {matches[0][1]}")
         hash = matches1[0]
         id = matches[0][0]
-        qiandao(hash,headers)
+        qiandao(hash, headers)
         time.sleep(3)
         infoo(id,headers)
 
@@ -93,18 +93,27 @@ def infoo(id,headers):#我的信息
           return
     pr(f"积分: {matches[0]} 精币: {matches1[0]} 荣誉: {matches2[0]} 签到累计天数: {matches3[0][0]} 本月签到天数: {matches3[0][2]} 连续签到天数: {matches3[0][1]} ")
 
-def qiandao(hash,headers):#签到
-    url = f"https://bbs.ijingyi.com/plugin.php?id=dsu_paulsign:sign&operation=qiandao&infloat=1"
-    data = {'formhash':hash,"submit": "1","targerurl": "","todaysay": "","qdxq": "kx"}
-    response = requests.post(url=url,headers=headers,data=data)
-    response.encoding = "utf-8"
-    info = json.loads(response.text)
-    if 1 == info['status']:
-        pr(f"签到成功,连续签到 {info['credit']} 天")
-    elif 0 == info['status']:
-        pr("今日已签到")    
-    else:
-        pr(f"签到失败,{info}")    
+def qiandao(hash, headers):
+    url = "https://bbs.ijingyi.com/plugin.php?id=dsu_paulsign:sign&operation=qiandao&infloat=1"
+    data = {
+        'formhash': hash,
+        "submit": "1",
+        "targerurl": "",
+        "todaysay": "",
+        "qdxq": "kx"
+    }
+    
+    try:
+        response = requests.post(url=url, headers=headers, data=data)
+        response.encoding = "utf-8"
+        info = json.loads(response.text)
+  
+        if info['status'] == 1:
+            pr(f"签到成功,连续签到 {info['data']['mdays']} 天")
+        else:
+            pr(f"签到失败: {info}")  
+    except Exception as e:
+        pr(f"签到过程中发生未知错误: {str(e)}")   
 
 def sicxs():
     config_path = 'config.py'
