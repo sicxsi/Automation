@@ -25,19 +25,19 @@ def get_with_retries(url, headers, max_retries=3, timeout=5):
             elapsed = time.time() - start
             if elapsed > timeout:
                 pr(f"第{attempt}次 请求耗时 {elapsed:.2f}s（>{timeout}s），视为失败，重试中...")
-                time.sleep(1)
+                time.sleep(3)
                 continue
             if resp.status_code != 200:
                 pr(f"第{attempt}次 返回状态 {resp.status_code}，视为失败，重试中...")
-                time.sleep(1)
+                time.sleep(3)
                 continue
             return resp
         except requests.exceptions.Timeout:
             pr(f"第{attempt}次 请求超时（>{timeout}s），重试中...")
-            time.sleep(1)
+            time.sleep(3)
         except requests.RequestException as e:
             pr(f"第{attempt}次 请求异常: {e}，重试中...")
-            time.sleep(1)
+            time.sleep(3)
     pr(f"请求超过最大重试次数 ({max_retries})，跳过当前账号。")
     return None
 
@@ -61,6 +61,7 @@ def index(cookie):
         info = response.text
         if "打卡" in info:
             pr("账号登陆成功")
+            signin(cookie)
             if "已经打卡" in info:
                 pr("您今天已经打卡过了，请勿重复打卡。")
                 torrents(cookie)
@@ -83,13 +84,8 @@ def signin(cookie):
     }
     try:
         response = get_with_retries(url, header, max_retries=3, timeout=5)
-        if not response:
-            pr("本账号打卡请求失败，跳过该账号。")
-            return
-        time.sleep(3)
-        info = response.text
-        if "已经打卡" in info or "已打卡" in info or "打卡成功" in info:
-            pr("打卡成功,请勿重复打卡。")
+        if response.status_code == 200:
+            pr("打卡成功，请勿重复刷新。")
             torrents(cookie)
         else:
             pr("打卡失败，已达到最大重试次数，跳过该账号。")

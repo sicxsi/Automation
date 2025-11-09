@@ -26,21 +26,22 @@ def get_with_retries(url, headers, max_retries=3, timeout=5):
             elapsed = time.time() - start
             if elapsed > timeout:
                 pr(f"第{attempt}次 请求耗时 {elapsed:.2f}s（>{timeout}s），视为失败，重试中...")
-                time.sleep(1)
+                time.sleep(3)
                 continue
             if resp.status_code != 200:
                 pr(f"第{attempt}次 返回状态 {resp.status_code}，视为失败，重试中...")
-                time.sleep(1)
+                time.sleep(3)
                 continue
             return resp
         except requests.exceptions.Timeout:
             pr(f"第{attempt}次 请求超时（>{timeout}s），重试中...")
-            time.sleep(1)
+            time.sleep(3)
         except requests.RequestException as e:
             pr(f"第{attempt}次 请求异常: {e}，重试中...")
-            time.sleep(1)
+            time.sleep(3)
     pr(f"请求超过最大重试次数 ({max_retries})，跳过当前账号。")
     return None
+
 
 def index(cookie):
     url = 'https://www.hddolby.com/index.php'
@@ -92,7 +93,7 @@ def attendance(cookie):
             return
         time.sleep(3)
         info = response.text
-        if "签到已得" in info:
+        if "签到成功" in info:
             pr("签到成功，请勿重复刷新。")
             torrents(cookie)
         else:
