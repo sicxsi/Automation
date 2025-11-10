@@ -62,11 +62,6 @@ def index(cookie):
         if "打卡" in info:
             pr("账号登陆成功")
             signin(cookie)
-            if "已经打卡" in info:
-                pr("您今天已经打卡过了，请勿重复打卡。")
-                torrents(cookie)
-            else:
-                signin(cookie)
         else:
             pr("登录失败, 请检查cookie是否正确")
     except Exception as e:
