@@ -1,4 +1,3 @@
-
 # name: 杜比
 # Author: sicxs
 # Date: 2024-11-04
@@ -6,9 +5,8 @@
 # 请不要异地签到，最起码在本地先登陆下
 # cron: 10 8 * * *
 # new Env('杜比');
-import requests
-import re,time
-import os,sys
+import requests, time
+import re,os,sys
 from notify import send
 
 def pr(message):
@@ -18,57 +16,90 @@ def pr(message):
 msg = []
 
 s = requests.session()
+
+def get_with_retries(url, headers, max_retries=3, timeout=5):
+    """请求超过 timeout 视为失败，最多重试 max_retries 次。三次失败返回 None（跳过当前账号）。"""
+    for attempt in range(1, max_retries + 1):
+        try:
+            start = time.time()
+            resp = s.get(url=url, headers=headers, timeout=timeout)
+            elapsed = time.time() - start
+            if elapsed > timeout:
+                pr(f"第{attempt}次 请求耗时 {elapsed:.2f}s（>{timeout}s），视为失败，重试中...")
+                time.sleep(3)
+                continue
+            if resp.status_code != 200:
+                pr(f"第{attempt}次 返回状态 {resp.status_code}，视为失败，重试中...")
+                time.sleep(3)
+                continue
+            return resp
+        except requests.exceptions.Timeout:
+            pr(f"第{attempt}次 请求超时（>{timeout}s），重试中...")
+            time.sleep(3)
+        except requests.RequestException as e:
+            pr(f"第{attempt}次 请求异常: {e}，重试中...")
+            time.sleep(3)
+    pr(f"请求超过最大重试次数 ({max_retries})，跳过当前账号。")
+    return None
+
+
 def index(cookie):
-     url = 'https://www.hddolby.com/index.php'
-     header = {
+    url = 'https://www.hddolby.com/index.php'
+    header = {
         "authority": "www.hddolby.com",
         "method": "GET",
         "path": "/index.php",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+        "User-Agent": "Mozilla/5.0",
         "content-type": "text/html; charset=utf-8; Cache-control:private",
         "host":"www.hddolby.com",
         "referer":"https://www.hddolby.com/index.php",
         "cookie":cookie
     }
-     try:
-        response = s.get(url=url,headers=header)
-        info = response.text
+    try:
+        response = get_with_retries(url, header, max_retries=3, timeout=5)
+        if not response:
+            pr("本账号请求失败，跳过该账号。")
+            return
         time.sleep(3)
+        info = response.text
         if "签到" in info:
-         pr("账号登陆成功")
-         if "签到已得" in info:
-            pr("您今天已经签到过了，请勿重复刷新。")
-            torrents(cookie)
-         else:
-          attendance(cookie)
+            pr("账号登陆成功")
+            if "签到已得" in info:
+                pr("您今天已经签到过了，请勿重复刷新。")
+                torrents(cookie)
+            else:
+                attendance(cookie)
         else:
-         pr("登录失败")
-     except Exception as e:
-          pr(e)
+            pr("登录失败")
+    except Exception as e:
+        pr(e)
+
 def attendance(cookie):
-     url = 'https://www.hddolby.com/attendance.php'
-     header = {
+    url = 'https://www.hddolby.com/attendance.php'
+    header = {
         "authority": "www.hddolby.com",
         "method": "GET",
         "path": "/attendance.php",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+        "User-Agent": "Mozilla/5.0",
         "content-type": "text/html; charset=utf-8; Cache-control:private",
         "host":"www.hddolby.com",
         "referer":"https://www.hddolby.com/index.php",
         "cookie":cookie
     }
-     try:
-        response = s.get(url=url,headers=header)
-        info = response.text
+    try:
+        response = get_with_retries(url, header, max_retries=3, timeout=5)
+        if not response:
+            pr("本账号签到请求失败，跳过该账号。")
+            return
         time.sleep(3)
-        if "签到已得" in info:
-         pr("签到成功，请勿重复刷新。")
-         torrents(cookie)
-        else :
-          pr("签到中...")
-          attendance(cookie)
-     except Exception as e:
-          pr(e)
+        info = response.text
+        if "签到成功" in info:
+            pr("签到成功，请勿重复刷新。")
+            torrents(cookie)
+        else:
+            pr("签到失败，已达到最大重试次数，跳过该账号。")
+    except Exception as e:
+        pr(e)
 def torrents(cookie):
      url = 'https://www.hddolby.com/torrents.php'
      header = {

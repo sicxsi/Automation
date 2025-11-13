@@ -1,13 +1,11 @@
-
 # name: 海胆
 # Author: sicxs
 # Date: 2024-11-2
 # export wy_haidan="cookie"  换行,&分割
 # cron: 10 9 * * *
 # new Env('海胆');
-import requests
+import requests, time
 import re,os,sys
-import time
 from notify import send
 
 def pr(message):
@@ -16,59 +14,78 @@ def pr(message):
 
 msg = []
 
+s = requests.session()
+
+def get_with_retries(url, headers, max_retries=3, timeout=5):
+    """请求超过 timeout 视为失败，最多重试 max_retries 次。三次失败返回 None（跳过当前账号）。"""
+    for attempt in range(1, max_retries + 1):
+        try:
+            start = time.time()
+            resp = s.get(url=url, headers=headers, timeout=timeout)
+            elapsed = time.time() - start
+            if elapsed > timeout:
+                pr(f"第{attempt}次 请求耗时 {elapsed:.2f}s（>{timeout}s），视为失败，重试中...")
+                time.sleep(3)
+                continue
+            if resp.status_code != 200:
+                pr(f"第{attempt}次 返回状态 {resp.status_code}，视为失败，重试中...")
+                time.sleep(3)
+                continue
+            return resp
+        except requests.exceptions.Timeout:
+            pr(f"第{attempt}次 请求超时（>{timeout}s），重试中...")
+            time.sleep(3)
+        except requests.RequestException as e:
+            pr(f"第{attempt}次 请求异常: {e}，重试中...")
+            time.sleep(3)
+    pr(f"请求超过最大重试次数 ({max_retries})，跳过当前账号。")
+    return None
+
 def index(cookie):
-     url = 'https://www.haidan.video/index.php'
-     header = {
+    url = 'https://www.haidan.video/index.php'
+    header = {
         "authority": "www.haidan.video",
         "method": "GET",
         "path": "/index.php",
         "referer":"https://www.haidan.video/torrents.php",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+        "User-Agent": "Mozilla/5.0",
         "content-type": "text/html; charset=utf-8; Cache-control:private",
         "cookie":cookie
     }
-     try:
-        response = requests.get(url=url,headers=header)
+    try:
+        response = get_with_retries(url, header, max_retries=3, timeout=5)
+        if not response:
+            pr("账号登录失败，跳过该账号。")
+            return
         time.sleep(3)
         info = response.text
         if "打卡" in info:
-         pr("账号登陆成功")
-
-         if "已经打卡" in info:
-           pr("您今天已经打卡过了，请勿重复打卡。")
-
-           torrents(cookie)
-         else:
-          signin(cookie)
+            pr("账号登陆成功")
+            signin(cookie)
         else:
-         pr("登录失败,等待10秒后重试")
-         time.sleep(10)
-         signin(cookie)  
-     except Exception as e:
-          pr("登录失败,请检查cookie是否正确")
+            pr("登录失败, 请检查cookie是否正确")
+    except Exception as e:
+        pr(e)
+
 def signin(cookie):
-     url = 'https://www.haidan.video/signin.php'
-     header = {
+    url = 'https://www.haidan.video/signin.php'
+    header = {
         "authority": "www.haidan.video",
         "method": "GET",
         "path": "/signin.php",
         "referer":"https://www.haidan.video/index.php",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+        "User-Agent": "Mozilla/5.0",
         "cookie":cookie
     }
-     try:
-        response = requests.get(url=url,headers=header)
-        time.sleep(3)
+    try:
+        response = get_with_retries(url, header, max_retries=3, timeout=5)
         if response.status_code == 200:
-           pr("打卡成功,请勿重复打卡。")
-           torrents(cookie)
+            pr("打卡成功，请勿重复刷新。")
+            torrents(cookie)
         else:
-           pr("打卡失败？")  
-        
-     except Exception as e:
-          
-          pr("登录失败")
-          
+            pr("打卡失败，已达到最大重试次数，跳过该账号。")
+    except Exception as e:
+        pr(e)
 def torrents(cookie):
      url = 'https://www.haidan.video/torrents.php'
      header = {
@@ -98,7 +115,7 @@ def torrents(cookie):
         matches4 = pattern5.findall(info)
 
         if not matches or not matches1 or not matches2 or not matches3 or not matches4:
-          pr("解析用户信息失败，可能页面结构变化或 cookie 无效")
+          pr("解析用户信息失败")
           return
         pr( "用户名：" + matches[0] + " 魔力值：" + matches2[0][1] + " 分享率" + matches1[0] +  " 上传量" + matches3[0] + " 下载量" + matches4[0])
      except Exception as e:
