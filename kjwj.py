@@ -38,13 +38,18 @@ def logn(zhanghao,mima):
         "confirmPassword": "",
         "loginType": ""
         }
-     try:
-        response = requests.post(url=url,headers=header,data=data)
+     try: 
+        response = requests.post(url=url, headers=header, data=data)
         response.encoding = "utf-8"
         info = json.loads(response.text)
-        return info['token']
+        if 'token' in info:
+            return info['token']
+        else:
+            pr(f"登录失败: {info.get('message', info)}")
+            return None
      except Exception as e:
-          pr(e)
+        pr(str(e))
+        return None
 
 
 def getUserInfo(authorization):#我的信息
@@ -171,6 +176,9 @@ def sicxs():
             pr(f"账号【{i + 1}】开始执行：")
             list = list_cookie_i.split("#")
             authorization = logn(list[0], list[1])
+            if not authorization:
+                pr("登录失败，跳过该账号")
+                continue
             getUserInfo(authorization)
         except Exception as e:
             print(f"账号【{i + 1}/{total_cookies}】执行出错{e}")    
