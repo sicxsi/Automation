@@ -24,6 +24,7 @@
 | 铃音           | 自动签到           | https://pt.soulvoice.club            |
 | 通信人家园     | 登录           | https://txrjy.com                    |
 | 名创优品          | 自动签到           | 微信小程序            |
+| 音乐磁场          | 自动签到           | https://www.hifiti.com          |
 
 
 ---
