@@ -290,7 +290,7 @@ def set_session_proxy(session, proxy_str):
     """为 session 设置代理，支持传入 host:port 或带协议的完整代理地址。
     如果不以 http/https/socks5 开头，默认加上 socks5:// 前缀。"""
     if not proxy_str:
-        return
+        return False
     p = proxy_str.strip()
     if not (p.startswith('socks5://') or p.startswith('http://') or p.startswith('https://')):
         p = 'socks5://' + p
@@ -298,7 +298,31 @@ def set_session_proxy(session, proxy_str):
         'http': p,
         'https': p,
     })
-    pr(f"已设置代理: {p}")
+    pr(f"已设置代理: {p}，正在检测连通性...")
+
+    # 简单连通性检测：请求外部 IP 服务，若失败则回退为直连
+    test_urls = [
+        "https://api.ipify.org?format=json",
+        "https://ifconfig.me/all.json",
+    ]
+    ok = False
+    for url in test_urls:
+        try:
+            r = session.get(url, timeout=6)
+            if r.status_code == 200 and r.text:
+                pr(f"代理连通性检测通过: {url}")
+                ok = True
+                break
+        except Exception as e:
+            continue
+
+    if not ok:
+        # 回退为直连
+        session.proxies.clear()
+        pr("代理不可用，已回退为直连（本地）")
+        return False
+
+    return True
 
 def get_accounts():
     """固定代码，获取变量"""
@@ -344,7 +368,9 @@ def sicxs():
             skey = parts[1]
             # 可选代理参数
             if len(parts) >= 3 and parts[2].strip():
-                set_session_proxy(session, parts[2].strip())
+                proxy_ok = set_session_proxy(session, parts[2].strip())
+                if not proxy_ok:
+                    pr("代理检测失败，继续使用本地直连")
             index(uid, skey, session)
         except Exception as e:
             print(f"账号【{i}/{total}】执行出错：{e}")
