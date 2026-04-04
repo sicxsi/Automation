@@ -2,6 +2,7 @@
 # Author: sicxs
 # Date: 2024-11-3
 # export wy_rigth="cookie" 换行,&分割
+# 本地网络抓取cookie，请勿异地抓
 # cron: 20 8 * * *
 # new Env('恩山无线论坛');
 
