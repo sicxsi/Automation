@@ -1,7 +1,7 @@
-# 脚本合集说明
+# 脚本说明
 
 本仓库收录了多个常用站点的自动签到/任务脚本，支持青龙面板与本地 Python 环境运行。
-本仓库代码都是AI生成，自行测试封号概不负责。
+本仓库代码都是手搓+AI修改，自行测试,封号概不负责。
 
 ---
 
@@ -10,26 +10,27 @@
 | 脚本名         | 功能简介           | 目标网址/平台                        |
 | -------------- | ------------------ | ------------------------------------ |
 | 白鲸鱼回收     | 自动签到     | 微信小程序             |
-| 科技玩家       | 自动签到     | https://www.kejiwanjia.com           |
-| 恩山无线论坛   | 自动签到           | https://www.right.com.cn             |
-| 飞牛nas        | 自动签到           | https://www.fenew.com                |
-| 隔壁网         | 自动签到           | https://www.gebi1.com                |
-| 海胆           | 自动签到           | https://www.haidan.video             |
-| 杜比           | 自动签到           | https://www.hddolby.com              |
-| 家园           | 自动签到           | https://www.hdhome.org               |
-| 全球主机论坛   | 自动签到           | https://hostloc.com                  |
+| 科技玩家       | 登录，自动签到     | https://www.kejiwanjia.com           |
+| 恩山无线论坛   | 登录，自动签到           | https://www.right.com.cn             |
+| 飞牛nas        |登录， 自动签到           | https://www.fenew.com                |
+| 隔壁网         | 登录，自动签到           | https://www.gebi1.com                |
+| 海胆           | 登录，自动签到           | https://www.haidan.video             |
+| 杜比           | 登录，自动签到           | https://www.hddolby.com              |
+| 家园           | 登录，自动签到           | https://www.hdhome.org               |
+| 全球主机论坛   | 登录，自动签到           | https://hostloc.com                  |
 | 回收猿回收     | 自动签到           | 微信小程序                |
 | 葫芦侠三楼     | 自动签到           | app           |
 | 精益论坛       | 自动签到           | https://www.jylt.com                 |
 | 铃音           | 自动签到           | https://pt.soulvoice.club            |
-| 通信人家园     | 自动登录           | https://txrjy.com                    |
+| 通信人家园     | 登录           | https://txrjy.com                    |
 | 名创优品          | 自动签到           | 微信小程序            |
 
 
 ---
 
 ## 青龙面板使用方法
-
+### 在青龙面板订阅管理中添加订阅
+### 订阅地址：https://github.com/sicxsi/Automation.git
 
 
 ## 本地运行方法
@@ -62,9 +63,6 @@
 ## 说明
 
 - 多账号支持：变量用换行或 `&` 分割。
-- 通知：部分脚本支持青龙通知（需配置通知模块）。
-- 若遇到问题，请先检查变量格式和依赖环境。
+- 若遇到问题，请先检查变量格式和依赖环境，文件头部会有说明。
+- 如果有需要的签到的简单网站欢迎反馈。
 
----
-
-如需详细使用说明或遇到问题，欢迎提交
