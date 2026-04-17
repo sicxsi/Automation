@@ -21,17 +21,17 @@ STATUS_FORCE_LIST = [429, 500, 502, 503, 504]
 
 def get_header(cookie):
     header = {
-        "authority": "www.haidan.video",
+        "authority": "www.haidan.cc",
         "method": "GET",
         "path": "/index.php",
-        "referer":"https://www.haidan.video/torrents.php",
+        "referer":"https://www.haidan.cc/torrents.php",
         "User-Agent": "Mozilla/5.0",
         "content-type": "text/html; charset=utf-8; Cache-control:private",
         "cookie":cookie
     }
     return header
 def index(cookie, session):
-    url = 'https://www.haidan.video/index.php'
+    url = 'https://www.haidan.cc/index.php'
     header = get_header(cookie)
     try:
         response = session.get(url, headers=header)
@@ -49,7 +49,7 @@ def index(cookie, session):
         pr(e)
 
 def signin(cookie, session):
-    url = 'https://www.haidan.video/signin.php'
+    url = 'https://www.haidan.cc/signin.php'
     header = get_header(cookie)
     try:
         response = session.get(url, headers=header)
@@ -60,29 +60,45 @@ def signin(cookie, session):
             pr("打卡失败，已达到最大重试次数，跳过该账号。")
     except Exception as e:
         pr(e)
+
+
+def user_stats(html): 
+    stats = {}
+    html = html.replace('&nbsp;', ' ')
+    patterns = {
+        'username': r"class=['\"]\w*User_Name['\"]><b>(.*?)</b>",
+        'bonus': r'id=["\']magic_num["\']>([^<]+)</span>',
+        'share_ratio': r"分享率[：:][\s\S]*?</font>\s*([\d.]+)",
+        'uploaded': r"上传量[：:][\s\S]*?</font>\s*([\d.]+\s*[PTGMK]?B)",
+        'downloaded': r"下载量[：:][\s\S]*?</font>\s*([\d.]+\s*[PTGMK]?B)",
+        'm_level_bonus': r"等级积分[\s\S]*?<span>\s*([\d,.]+)\s*</span>",
+    }
+    for key, pattern in patterns.items():
+        try:
+            match = re.search(pattern, html)
+            if match:
+                value = match.group(1).strip()
+                value = re.sub(r'\s+', ' ', value)
+                stats[key] = value
+            else:
+                stats[key] = "未找到"
+        except Exception as e:
+            stats[key] = f"解析错误({e})"
+    return stats
+
+
+
 def torrents(cookie, session):
-    url = 'https://www.haidan.video/torrents.php'
+    url = 'https://www.haidan.cc/torrents.php'
     header = get_header(cookie)
     try:
         response = session.get(url=url, headers=header)
-        info = response.text
-        time.sleep(3)
-        pattern = re.compile(r"class='VeteranUser_Name'><b>(.+?)</b>")
-        pattern2 = re.compile(r'分享率:             </font> (.*?)        ')
-        pattern3 = re.compile(r'<span id="(.*)">(.*?)</span>')
-        pattern4 = re.compile(r'上传量:             </font> (.*?)        ')
-        pattern5 = re.compile(r'下载量:             </font> (.*?)        ')
-
-        matches = pattern.findall(info)
-        matches1 = pattern2.findall(info)
-        matches2 = pattern3.findall(info)
-        matches3 = pattern4.findall(info)
-        matches4 = pattern5.findall(info)
-
-        if not matches or not matches1 or not matches2 or not matches3 or not matches4:
-            pr("解析用户信息失败")
-            return
-        pr("用户名：" + matches[0] + " 魔力值：" + matches2[0][1] + " 分享率" + matches1[0] + " 上传量" + matches3[0] + " 下载量" + matches4[0])
+        requests = response.text
+        stats = user_stats(requests)
+        if stats['username'] == "未找到":
+          print("页面解析失败，未找到用户名。")
+          return
+        pr(f"用户名: {stats['username']}, 魔力值: {stats['bonus']}, 上传量: {stats['uploaded']}, 下载量: {stats['downloaded']}, 分享率: {stats['share_ratio']}, 等级积分: {stats['m_level_bonus']}")
     except Exception as e:
         pr("登陆失败")
 
